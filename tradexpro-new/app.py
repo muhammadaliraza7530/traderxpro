@@ -154,10 +154,33 @@ def transaction_history():
 def markets():
     return render_template("markets.html")
 
+@app.route("/market-detail")
+@app.route("/market-detail.html")
+def market_detail():
+    requested_symbol = request.args.get("symbol", "BTCUSDT")
+    symbol = requested_symbol.strip().upper() if isinstance(requested_symbol, str) else "BTCUSDT"
+    asset_key = symbol.removesuffix("USDT")
+    asset = TRADING_ASSETS.get(asset_key)
+    if asset is None:
+        symbol = "BTCUSDT"
+        asset = TRADING_ASSETS["BTC"]
+        asset_key = "BTC"
+    pair = request.args.get("pair", f"{asset_key}/USDT") if symbol == requested_symbol.upper() else "BTC/USDT"
+    return render_template("market-detail.html", symbol=symbol, pair=pair, asset=asset)
+
 @app.route("/staking")
 @app.route("/staking.html")
 def staking():
     return render_template("staking.html")
+
+@app.route("/trade.html")
+def trade_page():
+    symbol = request.args.get("symbol", "BTCUSDT").upper()
+    pair = request.args.get("pair", f"{symbol}/USDT")
+    asset = TRADING_ASSETS.get(symbol.removesuffix("USDT"))
+    if asset is None:
+        abort(404)
+    return render_template("trading.html", symbol=symbol, pair=pair, asset=asset)
 
 @app.route("/trading/<symbol>")
 def trading(symbol):

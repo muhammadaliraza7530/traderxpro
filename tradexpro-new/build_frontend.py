@@ -30,6 +30,8 @@ PAGES = {
     "/transactions.html": "wallets.html",
     "/markets": "markets.html",
     "/markets.html": "markets.html",
+    "/market-detail": "market-detail.html",
+    "/market-detail.html": "market-detail.html",
     "/staking": "staking.html",
     "/staking.html": "staking.html",
     "/trading/BTC": "trading.html",
