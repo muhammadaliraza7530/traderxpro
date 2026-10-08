@@ -532,44 +532,35 @@ const drawGridLines = (candles, geometry, width, height) => {
     }
 };
 
-const drawCandlesticks = (candles, geometry) => {
+const drawLineChart = (candles, geometry) => {
     if (!candles.length) return;
 
     const { plot, priceToY, xFor } = geometry;
-    const candleWidth = Math.max(2, Math.min(8, (geometry.plot.right - geometry.plot.left) / candles.length * 0.72));
+    const gradient = ctx.createLinearGradient(0, plot.top, 0, plot.bottom);
+    gradient.addColorStop(0, 'rgba(240,185,11,0.25)');
+    gradient.addColorStop(1, 'rgba(240,185,11,0.00)');
+
+    ctx.beginPath();
     candles.forEach((candle, index) => {
         const x = xFor(index);
-        const openY = priceToY(candle.open);
-        const closeY = priceToY(candle.close);
-        const highY = priceToY(candle.high);
-        const lowY = priceToY(candle.low);
-        const color = candle.close >= candle.open ? '#0ECB81' : '#F6465D';
-
-        ctx.strokeStyle = color;
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(x, highY);
-        ctx.lineTo(x, lowY);
-        ctx.stroke();
-
-        ctx.fillStyle = color;
-        ctx.fillRect(x - candleWidth / 2, Math.min(openY, closeY), candleWidth, Math.max(Math.abs(closeY - openY), 1.5));
+        const y = priceToY(candle.close);
+        if (index === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
     });
 
+    ctx.strokeStyle = '#F0B90B';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    const lastX = xFor(candles.length - 1);
+    const firstX = xFor(0);
+    ctx.lineTo(lastX, plot.bottom);
+    ctx.lineTo(firstX, plot.bottom);
+    ctx.closePath();
+    ctx.fillStyle = gradient;
+    ctx.fill();
+
     const average = movingAverage(candles, 60);
-    if (candles.length >= 60) {
-        ctx.beginPath();
-        ctx.strokeStyle = 'rgba(255,255,255,0.55)';
-        ctx.lineWidth = 1;
-        average.forEach((value, index) => {
-            if (index < 59) return;
-            const x = xFor(index);
-            const y = priceToY(value);
-            if (index === 59) ctx.moveTo(x, y);
-            else ctx.lineTo(x, y);
-        });
-        ctx.stroke();
-    }
     ma60Value.textContent = average.length ? formatAxisPrice(average[average.length - 1]) : '--';
 };
 
@@ -697,7 +688,7 @@ const renderChartWithZoom = () => {
     renderedCandles = visibleCandles;
     renderedGeometry = geometry;
     drawGridLines(visibleCandles, geometry, width, height);
-    drawCandlesticks(visibleCandles, geometry);
+    drawLineChart(visibleCandles, geometry);
     drawVolumeBars(visibleCandles, width, height);
     if (scrollOffset === 0) drawLivePriceLine(geometry, width);
     drawRightAxisLabels(geometry, width);

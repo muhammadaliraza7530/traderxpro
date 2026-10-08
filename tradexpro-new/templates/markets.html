@@ -39,25 +39,63 @@
                 </div>
             </div>
 
-            <div id="marketTabs" class="flex items-center gap-6 px-4 border-b border-gray-800/60 overflow-x-auto no-scrollbar" role="tablist" aria-label="Market categories">
-                <button data-tab="all" class="market-tab relative py-2.5 text-xs font-bold text-white transition-all" type="button" role="tab" aria-selected="true">
-                    All
-                    <span class="active-indicator absolute bottom-0 left-0 right-0 h-[2px] bg-[#F0B90B] rounded-full"></span>
-                </button>
-                <button data-tab="hot" class="market-tab relative py-2.5 text-xs font-medium text-gray-400 hover:text-gray-200 transition-all" type="button" role="tab" aria-selected="false">Hot<span class="active-indicator absolute bottom-0 left-0 right-0 h-[2px] bg-[#F0B90B] rounded-full"></span></button>
-                <button data-tab="gainers" class="market-tab relative py-2.5 text-xs font-medium text-gray-400 hover:text-gray-200 transition-all" type="button" role="tab" aria-selected="false">Gainers<span class="active-indicator absolute bottom-0 left-0 right-0 h-[2px] bg-[#F0B90B] rounded-full"></span></button>
-                <button data-tab="losers" class="market-tab relative py-2.5 text-xs font-medium text-gray-400 hover:text-gray-200 transition-all" type="button" role="tab" aria-selected="false">Losers<span class="active-indicator absolute bottom-0 left-0 right-0 h-[2px] bg-[#F0B90B] rounded-full"></span></button>
-                <button data-tab="new" class="market-tab relative py-2.5 text-xs font-medium text-gray-400 hover:text-gray-200 transition-all" type="button" role="tab" aria-selected="false">New<span class="active-indicator absolute bottom-0 left-0 right-0 h-[2px] bg-[#F0B90B] rounded-full"></span></button>
+            <div class="tabs-container" id="marketCategoryTabs" aria-label="Market navigation">
+                <div class="tabs-row tabs-row-main" role="tablist" aria-label="Market categories">
+                    <button class="market-category-tab is-active" data-category="favorites" type="button" role="tab" aria-selected="true">Favorites ★</button>
+                    <button class="market-category-tab" data-category="crypto" type="button" role="tab" aria-selected="false">Crypto</button>
+                    <button class="market-category-tab" data-category="prediction" type="button" role="tab" aria-selected="false">Prediction Pairs</button>
+                    <button class="market-category-tab" data-category="gainers" type="button" role="tab" aria-selected="false">Top Gainers</button>
+                    <button class="market-category-tab" data-category="losers" type="button" role="tab" aria-selected="false">Top Losers</button>
+                    <span class="tab-underline" aria-hidden="true"></span>
+                </div>
+                <div class="tabs-row tabs-row-secondary" role="tablist" aria-label="Market products">
+                    <button class="sub-tab active active-sub" data-sub-category="spot" data-tab="spot" type="button" role="tab" aria-selected="true">Spot</button>
+                    <button class="sub-tab" data-sub-category="usdsm" data-tab="usdm" type="button" role="tab" aria-selected="false">USDⓈ-M</button>
+                    <button class="sub-tab" data-sub-category="coinm" type="button" role="tab" aria-selected="false">COIN-M</button>
+                    <button class="sub-tab" data-sub-category="options" type="button" role="tab" aria-selected="false">Options</button>
+                </div>
+                <div class="tabs-row tabs-row-tertiary" role="tablist" aria-label="Market themes">
+                    <button class="sub-tab active-sub" data-sub-category="ai" type="button" role="tab" aria-selected="true">AI</button>
+                    <button class="sub-tab" data-sub-category="meme" type="button" role="tab" aria-selected="false">MEME</button>
+                    <button class="sub-tab" data-sub-category="monitoring" type="button" role="tab" aria-selected="false">Monitoring</button>
+                    <button class="sub-tab" data-sub-category="seed" type="button" role="tab" aria-selected="false">Seed</button>
+                    <button class="sub-tab" data-sub-category="defi" type="button" role="tab" aria-selected="false">DeFi</button>
+                    <button class="sub-tab" data-sub-category="usdt" type="button" role="tab" aria-selected="false">USDT ▾</button>
+                </div>
             </div>
 
-            <div class="market-head flex justify-between mt-2 px-4 py-2 text-[10px] font-semibold text-gray-400 border-b border-gray-800/60 uppercase" aria-hidden="true">
-                <div class="w-[38%] text-left">Name</div>
-                <div class="w-[32%] text-right pr-2">Last Price</div>
-                <div class="w-[30%] text-right">24h Chg%</div>
-            </div>
+            <div class="market-product-content">
+                <!-- Keep the existing Spot market list available as its own view. -->
+                <section id="spotMarketContent" class="market-view" aria-label="Spot markets">
+                    <div class="market-head flex justify-between mt-2 px-4 py-2 text-[10px] font-semibold text-gray-400 border-b border-gray-800/60 uppercase" aria-hidden="true">
+                        <div class="w-[38%] text-left">Name</div>
+                        <div class="w-[32%] text-right pr-2">Last Price</div>
+                        <div class="w-[30%] text-right">24h Chg%</div>
+                    </div>
+                    <div id="market-list" class="market-list" aria-live="polite"></div>
+                    <div id="market-empty" class="market-empty" hidden>No markets match your search.</div>
+                </section>
 
-            <div id="market-list" class="market-list" aria-live="polite"></div>
-            <div id="market-empty" class="market-empty" hidden>No markets match your search.</div>
+                <!-- USDⓈ-M rows are rendered here by markets.js when selected. -->
+                <section id="usdsmMarketContent" class="market-view futures-market-view" aria-label="USDⓈ-M perpetual futures" hidden>
+                    <div class="futures-filter-row" role="tablist" aria-label="Futures asset categories">
+                        <button class="futures-filter is-active" data-futures-filter="all" type="button" role="tab" aria-selected="true">All</button>
+                        <button class="futures-filter" data-futures-filter="New" type="button" role="tab" aria-selected="false">New</button>
+                        <button class="futures-filter" data-futures-filter="Crypto" type="button" role="tab" aria-selected="false">Crypto</button>
+                        <button class="futures-filter" data-futures-filter="DeFi" type="button" role="tab" aria-selected="false">DeFi</button>
+                        <button class="futures-filter" data-futures-filter="Metaverse" type="button" role="tab" aria-selected="false">Metaverse</button>
+                        <button class="futures-filter" data-futures-filter="Pay" type="button" role="tab" aria-selected="false">Pay</button>
+                    </div>
+                    <div class="futures-market-head" role="row">
+                        <span aria-hidden="true"></span>
+                        <button type="button" data-futures-sort="name">NAME ⇅</button>
+                        <button type="button" data-futures-sort="price">LAST PRICE ⇅</button>
+                        <button type="button" data-futures-sort="change">24H CHG% ⇅</button>
+                    </div>
+                    <div id="futures-market-list" class="futures-market-list" aria-live="polite"></div>
+                    <div id="futures-market-empty" class="market-empty" role="status" hidden>No perpetual pairs match this filter.</div>
+                </section>
+            </div>
         </section>
 
         {% include "_bottom-nav.html" %}

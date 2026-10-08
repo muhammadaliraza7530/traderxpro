@@ -393,12 +393,31 @@ const drawVolumeBars = (ctx, candles, geometry, width, height) => {
     ctx.stroke();
 };
 
+const drawChartWatermark = (ctx, canvas) => {
+    const siteName = String(window.SITE_NAME || 'TRADEXPRO').toUpperCase();
+    const width = canvas.clientWidth || canvas.width / (window.devicePixelRatio || 1);
+    const height = canvas.clientHeight || canvas.height / (window.devicePixelRatio || 1);
+    const fontSize = Math.min(36, width * 0.08);
+
+    ctx.save();
+    ctx.font = `900 ${fontSize}px sans-serif`;
+    const textWidth = ctx.measureText(siteName).width;
+    const maxWidth = width * 0.8;
+    if (textWidth > maxWidth) ctx.font = `900 ${fontSize * maxWidth / textWidth}px sans-serif`;
+    ctx.fillStyle = 'rgba(255,255,255,0.035)';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(siteName, width / 2, height / 2, maxWidth);
+    ctx.restore();
+};
+
 const drawChart = (candles, width, height) => {
     const ctx = chartContext;
     const geometry = getChartGeometry(candles, width, height);
     ctx.clearRect(0, 0, width, height);
     ctx.fillStyle = '#171b21';
     ctx.fillRect(0, 0, width, height);
+    drawChartWatermark(ctx, chartCanvas);
 
     drawGridLines(ctx, candles, geometry, width, height);
     drawLineChart(ctx, candles, geometry);
@@ -416,7 +435,13 @@ const renderChartWithZoom = () => {
     chartCanvas.style.width = `${width}px`;
     chartCanvas.style.height = `${height}px`;
     chartContext.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
-    if (chartData.length === 0) return;
+    if (chartData.length === 0) {
+        chartContext.clearRect(0, 0, width, height);
+        chartContext.fillStyle = '#171b21';
+        chartContext.fillRect(0, 0, width, height);
+        drawChartWatermark(chartContext, chartCanvas);
+        return;
+    }
 
     const maxScrollOffset = Math.max(0, chartData.length - Math.min(visibleCandleCount, chartData.length));
     scrollOffset = Math.min(scrollOffset, maxScrollOffset);
@@ -557,12 +582,13 @@ const updateKline = (kline) => {
         volume: normalizeCandleVolume(kline.v, kline.q, kline.c),
     };
 
+    if (updatedCandle.time < lastCandle.time) return;
     if (isActiveCandle) {
         lastCandle.high = Math.max(lastCandle.high, updatedCandle.high);
         lastCandle.low = Math.min(lastCandle.low, updatedCandle.low);
         lastCandle.close = updatedCandle.close;
         lastCandle.volume = updatedCandle.volume;
-    } else if (Boolean(kline.x)) {
+    } else {
         chartData.push(updatedCandle);
         chartData = chartData.slice(-100);
     }
@@ -611,6 +637,7 @@ const connectWebSocket = () => {
     };
 
     currentSocket.onmessage = (event) => {
+        if (requestId !== websocketRequestId) return;
         try {
             const frame = JSON.parse(event.data);
             if (frame.e === 'kline' && frame.k) updateKline(frame.k);

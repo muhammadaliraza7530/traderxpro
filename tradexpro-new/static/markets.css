@@ -50,16 +50,322 @@ body {
     font-size: 20px;
 }
 
-.market-tab .active-indicator {
-    opacity: 0;
-    transform: scaleX(0.25);
-    transform-origin: center;
-    transition: opacity 180ms ease, transform 180ms ease;
+.tabs-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 0 0 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    background: #202630;
 }
 
-.market-tab.is-active .active-indicator {
-    opacity: 1;
-    transform: scaleX(1);
+.tabs-row {
+    display: flex;
+    flex: 0 0 auto;
+    gap: 24px;
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-x;
+    user-select: none;
+    cursor: grab;
+}
+
+.tabs-row::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+}
+
+.tabs-row.is-dragging {
+    cursor: grabbing;
+}
+
+.tabs-row-main {
+    position: relative;
+    gap: 24px;
+    padding: 0 16px;
+}
+
+.tabs-row-main .market-category-tab {
+    flex: 0 0 auto;
+    padding: 12px 0;
+    border: 0;
+    background: transparent;
+    color: #8a8f98;
+    cursor: pointer;
+    font: 500 15px 'Inter', sans-serif;
+    white-space: nowrap;
+    transition: color 0.25s ease, font-weight 0.2s ease;
+}
+
+.tabs-row-main .market-category-tab:not(.is-active):hover {
+    color: #c8ccd4;
+}
+
+.tabs-row-main .market-category-tab.is-active {
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.tab-underline {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    border-radius: 2px;
+    background: #ffc940;
+    box-shadow: 0 0 6px rgba(255, 201, 64, 0.5);
+    pointer-events: none;
+    transition: left 0.3s ease, width 0.3s ease;
+}
+
+.tabs-row-secondary,
+.tabs-row-tertiary {
+    gap: 20px;
+    padding: 8px 16px 0;
+}
+
+.tabs-row-secondary {
+    margin-top: 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.sub-tab {
+    flex: 0 0 auto;
+    padding: 4px 0;
+    border: 0;
+    background: transparent;
+    color: #8a8f98;
+    cursor: pointer;
+    font: 500 14px 'Inter', sans-serif;
+    white-space: nowrap;
+    transition: color 0.2s ease, font-weight 0.2s ease;
+}
+
+.sub-tab:not(.active-sub):hover {
+    color: #c8ccd4;
+}
+
+.sub-tab.active-sub {
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.tabs-row-secondary .sub-tab {
+    padding: 6px 14px;
+    border-radius: 8px;
+}
+
+.tabs-row-secondary .sub-tab.active-sub {
+    background: #2a2e35;
+}
+
+/* Keep futures filters and market values readable within the existing shell. */
+.market-product-content,
+.market-view {
+    min-width: 0;
+    min-height: 0;
+}
+
+.futures-market-view {
+    max-width: 100%;
+    overflow-x: hidden;
+    background: #202630;
+}
+
+.futures-filter-row {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 12px 12px 8px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    white-space: nowrap;
+}
+
+.futures-filter-row::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+}
+
+.futures-filter {
+    flex: 0 0 auto;
+    padding: 6px 14px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: #8a8f98;
+    cursor: pointer;
+    font: 500 13px 'Inter', sans-serif;
+    transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+.futures-filter:hover {
+    color: #c8ccd4;
+}
+
+.futures-filter.is-active {
+    background: #2a2e35;
+    color: #ffffff;
+}
+
+.futures-market-head,
+.futures-market-row {
+    display: grid;
+    grid-template-columns: 24px minmax(0, 2fr) minmax(0, 1.2fr) minmax(72px, 1fr);
+    align-items: center;
+    column-gap: 8px;
+}
+
+.futures-market-head {
+    min-height: 38px;
+    padding: 0 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.futures-market-head button {
+    overflow: hidden;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #8a8f98;
+    cursor: pointer;
+    font: 500 12px 'Inter', sans-serif;
+    text-align: left;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.futures-market-head button:nth-of-type(n + 2) {
+    text-align: right;
+}
+
+.futures-market-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-width: 100%;
+    padding: 0 8px;
+    overflow-y: auto;
+}
+
+.futures-market-row {
+    min-height: 66px;
+    padding: 12px 4px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    color: #ffffff;
+    transition: background-color 0.16s ease;
+}
+
+.futures-market-row:hover {
+    background: #1e232a;
+}
+
+.futures-market-favorite {
+    display: grid;
+    width: 24px;
+    height: 28px;
+    place-items: center;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #626a75;
+    cursor: pointer;
+}
+
+.futures-market-favorite.is-favorite {
+    color: #ffc940;
+}
+
+.futures-market-favorite svg {
+    width: 15px;
+    height: 15px;
+    fill: currentColor;
+}
+
+.futures-market-name,
+.futures-market-price {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.futures-market-name-top {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 6px;
+}
+
+.futures-market-name-top strong {
+    overflow: hidden;
+    font-size: 15px;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.futures-perp-badge {
+    flex: 0 0 auto;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: #2a2e35;
+    color: #a0a5b0;
+    font-size: 10px;
+}
+
+.futures-market-name small,
+.futures-market-price small {
+    overflow: hidden;
+    color: #8a8f98;
+    font-size: 12px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.futures-market-price {
+    align-items: flex-end;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.futures-market-price strong {
+    overflow: hidden;
+    max-width: 100%;
+    font-size: 14px;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.futures-market-change {
+    justify-self: end;
+    padding: 6px 12px;
+    border-radius: 6px;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 600;
+    text-align: center;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.futures-market-change.is-positive {
+    background: #16a34a;
+}
+
+.futures-market-change.is-negative {
+    background: #dc2626;
+}
+
+.futures-market-list:empty + .market-empty {
+    display: block;
 }
 
 .market-head {
