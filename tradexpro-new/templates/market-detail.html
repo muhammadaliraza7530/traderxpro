@@ -30,27 +30,32 @@
             </button>
         </header>
 
-        <section class="market-summary px-4 pb-4">
-            <div class="flex items-end justify-between gap-4">
-                <div>
-                    <p class="mb-1 text-[10px] font-medium uppercase tracking-[0.14em] text-gray-500">Last price</p>
-                    <p id="currentPrice" class="text-2xl font-bold tracking-tight text-white">${{ asset.price }}</p>
+        <section class="market-summary">
+            <div class="px-4 py-3 bg-[#181A20] border-b border-gray-800/40 flex justify-between items-start gap-3">
+                <div class="flex min-w-0 flex-col">
+                    <div id="mainPrice" class="text-3xl font-extrabold text-[#0ECB81] tracking-tight whitespace-nowrap">${{ "{:,.2f}".format(asset.price) }}</div>
+                    <div class="flex items-center space-x-2 mt-1">
+                        <span id="priceSubtext" class="text-xs text-gray-400 font-medium">${{ "{:,.2f}".format(asset.price) }}</span>
+                        <span id="priceChangeBadge" class="text-xs font-semibold px-1.5 py-0.5 rounded bg-[#0ECB81]/10 text-[#0ECB81]">--</span>
+                    </div>
+                    <div class="flex items-center space-x-2 mt-2 text-[10px] text-gray-400 whitespace-nowrap">
+                        <span class="hover:text-white cursor-pointer">Payments</span>
+                        <span aria-hidden="true">&bull;</span>
+                        <span class="hover:text-white cursor-pointer">Vol</span>
+                        <span aria-hidden="true">&bull;</span>
+                        <span class="text-[#F0B90B] flex items-center cursor-pointer">Price Protection &gt;</span>
+                    </div>
                 </div>
-                <div id="priceChange" class="rounded-lg border border-[#0ECB81]/20 bg-[#0ECB81]/10 px-2.5 py-1.5 text-xs font-bold text-[#0ECB81]">--</div>
-            </div>
 
-            <div class="mt-4 grid grid-cols-3 gap-2 border-t border-gray-800/80 pt-4">
-                <div>
-                    <p class="text-[9px] uppercase tracking-wide text-gray-500">24h High</p>
-                    <p id="highPrice" class="mt-1 text-[11px] font-semibold text-gray-200">--</p>
-                </div>
-                <div>
-                    <p class="text-[9px] uppercase tracking-wide text-gray-500">24h Low</p>
-                    <p id="lowPrice" class="mt-1 text-[11px] font-semibold text-gray-200">--</p>
-                </div>
-                <div>
-                    <p class="text-[9px] uppercase tracking-wide text-gray-500">24h Volume</p>
-                    <p id="vol24h" class="mt-1 text-[11px] font-semibold text-gray-200">--</p>
+                <div class="grid grid-cols-2 gap-x-3 gap-y-1 text-right text-[11px]">
+                    <span class="text-gray-400">24h High</span>
+                    <span id="stat24High" class="text-white font-medium whitespace-nowrap">--</span>
+                    <span class="text-gray-400">24h Low</span>
+                    <span id="stat24Low" class="text-white font-medium whitespace-nowrap">--</span>
+                    <span id="stat24VolBaseLabel" class="text-gray-400 whitespace-nowrap">24h Vol({{ symbol.removesuffix('USDT') }})</span>
+                    <span id="stat24VolBTC" class="text-white font-medium whitespace-nowrap">--</span>
+                    <span id="stat24VolQuoteLabel" class="text-gray-400 whitespace-nowrap">24h Vol(USDT)</span>
+                    <span id="stat24VolUSDT" class="text-white font-medium whitespace-nowrap">--</span>
                 </div>
             </div>
         </section>

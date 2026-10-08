@@ -20,7 +20,8 @@ const data = {
     change: 0,
     high: 0,
     low: 0,
-    volume: '—',
+    volumeBase: 0,
+    volumeQuote: 0,
 };
 const timeframeLabels = {
     '1m': '1 minute',
@@ -43,6 +44,8 @@ let favorites = loadFavorites();
 let toastTimer;
 let activeTimeframe = 'Time';
 let chartData = [];
+let visibleCandleCount = 40;
+let scrollOffset = 0;
 let chartResizeObserver;
 let websocket;
 let reconnectTimer;
@@ -58,31 +61,48 @@ const currencyFormatter = new Intl.NumberFormat('en-US', {
     maximumFractionDigits: 2,
 });
 
-const priceFormatter = new Intl.NumberFormat('en-US', {
-    minimumFractionDigits: 4,
-    maximumFractionDigits: 4,
-});
-
-const compactFormatter = new Intl.NumberFormat('en-US', {
-    notation: 'compact',
-    maximumFractionDigits: 1,
-});
-
 const safeNumber = (value, fallback = 0) => {
     const parsed = Number(value);
     return Number.isFinite(parsed) ? parsed : fallback;
 };
 
+const normalizeCandleVolume = (baseVolume, quoteVolume, close) => {
+    const base = safeNumber(baseVolume);
+    if (base > 0) return base;
+
+    const quote = safeNumber(quoteVolume);
+    const closingPrice = safeNumber(close);
+    return quote > 0 && closingPrice > 0 ? quote / closingPrice : quote;
+};
+
+const formatLivePrice = (price) => new Intl.NumberFormat('en-US', {
+    minimumFractionDigits: price > 10 ? 2 : 4,
+    maximumFractionDigits: price > 10 ? 2 : 8,
+}).format(price);
+
+const formatVolume = (volume) => {
+    const magnitude = Math.abs(volume);
+    if (magnitude >= 1e9) return `${(volume / 1e9).toFixed(2)}B`;
+    if (magnitude >= 1e6) return `${(volume / 1e6).toFixed(1)}M`;
+    if (magnitude >= 1e3) return `${(volume / 1e3).toFixed(1)}K`;
+    return new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 }).format(volume);
+};
+
 const renderMarketStats = () => {
     document.getElementById('pairTitle').textContent = data.name;
-    document.getElementById('currentPrice').textContent = `$${priceFormatter.format(data.price)}`;
-    document.getElementById('priceChange').textContent = `${data.change >= 0 ? '+' : ''}${data.change.toFixed(2)}%`;
-    document.getElementById('highPrice').textContent = `$${currencyFormatter.format(data.high)}`;
-    document.getElementById('lowPrice').textContent = `$${currencyFormatter.format(data.low)}`;
-    document.getElementById('vol24h').textContent = `${data.volume} USDT`;
+    const formattedPrice = `$${formatLivePrice(data.price)}`;
+    document.getElementById('mainPrice').textContent = formattedPrice;
+    document.getElementById('priceSubtext').textContent = formattedPrice;
+    document.getElementById('priceChangeBadge').textContent = `${data.change >= 0 ? '+' : ''}${data.change.toFixed(2)}%`;
+    document.getElementById('stat24High').textContent = `$${currencyFormatter.format(data.high)}`;
+    document.getElementById('stat24Low').textContent = `$${currencyFormatter.format(data.low)}`;
+    document.getElementById('stat24VolBTC').textContent = formatVolume(data.volumeBase);
+    document.getElementById('stat24VolUSDT').textContent = formatVolume(data.volumeQuote);
 
-    const changeElement = document.getElementById('priceChange');
+    const changeElement = document.getElementById('priceChangeBadge');
+    const mainPriceElement = document.getElementById('mainPrice');
     const isPositive = data.change >= 0;
+    mainPriceElement.classList.toggle('is-negative', !isPositive);
     changeElement.classList.toggle('text-[#0ECB81]', isPositive);
     changeElement.classList.toggle('text-[#F6465D]', !isPositive);
     changeElement.classList.toggle('border-[#0ECB81]/20', isPositive);
@@ -130,7 +150,7 @@ const mapKlineResponse = (items) => items.map((item) => ({
     low: parseFloat(item[3]),
     close: parseFloat(item[4]),
     time: Number(item[0]),
-    volume: parseFloat(item[5] || 0),
+    volume: normalizeCandleVolume(item[5], item[7], item[4]),
 }));
 
 const yAxisWidth = 58;
@@ -342,45 +362,34 @@ const drawRightYAxisLabels = (ctx, geometry, width, height) => {
     }
 };
 
-const drawBottomCandles = (ctx, candles, geometry, width, height) => {
-    if (!candles.length) return;
+const drawVolumeBars = (ctx, candles, geometry, width, height) => {
+    if (!candles || candles.length === 0) return;
 
-    const { plot, bottomCandlesTop, bottomCandlesBottom, bottomCandlesHeight, xFor } = geometry;
-    const prices = candles.flatMap((candle) => [Number(candle.high), Number(candle.low)]);
-    const minPrice = Math.min(...prices);
-    const maxPrice = Math.max(...prices);
-    const priceRange = maxPrice - minPrice || 1;
-    const areaHeight = Math.max(1, bottomCandlesHeight);
-    const baseY = bottomCandlesBottom;
-    const candleWidth = Math.max(3, (plot.right - plot.left) / candles.length - 2);
-    const getBottomY = (price) => baseY - ((Number(price) - minPrice) / priceRange) * areaHeight;
+    const volumes = candles.map((candle) => Math.max(0, parseFloat(candle.volume) || 0));
+    const maxVolume = Math.max(...volumes, Number.EPSILON);
+    const availableWidth = width - 50;
+    const slotWidth = availableWidth / candles.length;
+    const barWidth = Math.max(3, slotWidth - 1);
+    const maxBarHeight = height * 0.2;
+    const minBarHeight = Math.max(6, height * 0.015);
+    const baseY = height - 2;
 
     candles.forEach((candle, index) => {
-        const x = xFor(index);
-        const highY = getBottomY(candle.high);
-        const lowY = getBottomY(candle.low);
-        const openY = getBottomY(candle.open);
-        const closeY = getBottomY(candle.close);
-        const isGreen = Number(candle.close) >= Number(candle.open);
-        const color = isGreen ? '#0ECB81' : '#F6465D';
-        const bodyTop = Math.min(openY, closeY);
-        const bodyHeight = Math.max(2, Math.abs(closeY - openY));
-
-        ctx.strokeStyle = color;
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(x, highY);
-        ctx.lineTo(x, lowY);
-        ctx.stroke();
-
-        ctx.fillStyle = color;
-        ctx.fillRect(x - candleWidth / 2, bodyTop, candleWidth, bodyHeight);
+        const x = index * slotWidth + slotWidth / 2;
+        const volume = volumes[index];
+        const barHeight = Math.max(minBarHeight, (volume / maxVolume) * maxBarHeight);
+        const y = baseY - barHeight;
+        const open = parseFloat(candle.open) || 0;
+        const close = parseFloat(candle.close) || 0;
+        const isGreen = close >= open;
+        ctx.fillStyle = isGreen ? '#0ECB81' : '#F6465D';
+        ctx.fillRect(x - barWidth / 2, y, barWidth, barHeight);
     });
 
     ctx.strokeStyle = 'rgba(255,255,255,0.035)';
     ctx.beginPath();
-    ctx.moveTo(plot.left, bottomCandlesTop);
-    ctx.lineTo(plot.right, bottomCandlesTop);
+    ctx.moveTo(geometry.plot.left, geometry.bottomCandlesTop);
+    ctx.lineTo(geometry.plot.right, geometry.bottomCandlesTop);
     ctx.stroke();
 };
 
@@ -393,12 +402,12 @@ const drawChart = (candles, width, height) => {
 
     drawGridLines(ctx, candles, geometry, width, height);
     drawLineChart(ctx, candles, geometry);
-    drawBottomCandles(ctx, candles, geometry, width, height);
+    drawVolumeBars(ctx, candles, geometry, width, height);
     drawLivePriceLine(ctx, geometry, width, height);
     drawRightYAxisLabels(ctx, geometry, width, height);
 };
 
-const renderChart = () => {
+const renderChartWithZoom = () => {
     const width = Math.max(chartHost.clientWidth, 300);
     const height = Math.max(chartHost.clientHeight, 390);
     const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
@@ -407,8 +416,82 @@ const renderChart = () => {
     chartCanvas.style.width = `${width}px`;
     chartCanvas.style.height = `${height}px`;
     chartContext.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
-    if (chartData.length > 0) drawChart(chartData, width, height);
+    if (chartData.length === 0) return;
+
+    const maxScrollOffset = Math.max(0, chartData.length - Math.min(visibleCandleCount, chartData.length));
+    scrollOffset = Math.min(scrollOffset, maxScrollOffset);
+    const endIndex = chartData.length - scrollOffset;
+    const visibleCandles = chartData.slice(Math.max(0, endIndex - visibleCandleCount), endIndex);
+    if (visibleCandles.length > 0) drawChart(visibleCandles, width, height);
 };
+
+const renderChart = () => renderChartWithZoom();
+
+const clampVisibleCandleCount = (value) => Math.max(10, Math.min(150, value));
+const activePointers = new Map();
+let dragStart;
+let pinchStart;
+
+const maxScrollOffset = () => Math.max(0, chartData.length - Math.min(visibleCandleCount, chartData.length));
+
+const getPointerDistance = () => {
+    const [first, second] = [...activePointers.values()];
+    return first && second ? Math.hypot(first.x - second.x, first.y - second.y) : 0;
+};
+
+chartCanvas.addEventListener('wheel', (event) => {
+    event.preventDefault();
+    visibleCandleCount = clampVisibleCandleCount(visibleCandleCount + (event.deltaY < 0 ? -3 : 3));
+    scrollOffset = Math.min(scrollOffset, maxScrollOffset());
+    renderChartWithZoom();
+}, { passive: false });
+
+chartCanvas.addEventListener('pointerdown', (event) => {
+    event.preventDefault();
+    chartCanvas.setPointerCapture(event.pointerId);
+    activePointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+    if (activePointers.size >= 2) {
+        dragStart = null;
+        pinchStart = { distance: getPointerDistance(), candleCount: visibleCandleCount, offset: scrollOffset };
+        chartCanvas.classList.remove('is-dragging');
+        return;
+    }
+    dragStart = { pointerId: event.pointerId, x: event.clientX, offset: scrollOffset };
+    chartCanvas.classList.add('is-dragging');
+});
+
+chartCanvas.addEventListener('pointermove', (event) => {
+    if (!activePointers.has(event.pointerId)) return;
+    activePointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+    if (activePointers.size >= 2 && pinchStart) {
+        const distance = getPointerDistance();
+        if (distance <= 0 || pinchStart.distance <= 0) return;
+        visibleCandleCount = clampVisibleCandleCount(Math.round(pinchStart.candleCount * pinchStart.distance / distance));
+        scrollOffset = Math.min(maxScrollOffset(), Math.max(0, pinchStart.offset + Math.round((pinchStart.candleCount - visibleCandleCount) / 2)));
+        renderChartWithZoom();
+        return;
+    }
+    if (!dragStart || dragStart.pointerId !== event.pointerId) return;
+    const candlesPerPixel = visibleCandleCount / Math.max(1, chartCanvas.clientWidth - 92);
+    scrollOffset = Math.max(0, Math.min(maxScrollOffset(), dragStart.offset + Math.round((dragStart.x - event.clientX) * candlesPerPixel)));
+    renderChartWithZoom();
+});
+
+const finishPointerInteraction = (event) => {
+    activePointers.delete(event.pointerId);
+    pinchStart = null;
+    dragStart = null;
+    if (activePointers.size === 1) {
+        const [pointerId, point] = [...activePointers.entries()][0];
+        dragStart = { pointerId, x: point.x, offset: scrollOffset };
+        chartCanvas.classList.add('is-dragging');
+    } else {
+        chartCanvas.classList.remove('is-dragging');
+    }
+};
+
+chartCanvas.addEventListener('pointerup', finishPointerInteraction);
+chartCanvas.addEventListener('pointercancel', finishPointerInteraction);
 
 timeframeButtons.forEach((button) => {
     button.addEventListener('click', () => {
@@ -420,6 +503,7 @@ timeframeButtons.forEach((button) => {
         window.clearTimeout(reconnectTimer);
         activeTimeframe = nextTimeframe;
         chartData = [];
+        scrollOffset = 0;
         timeframeButtons.forEach((item) => {
             const selected = item === button;
             item.classList.toggle('is-active', selected);
@@ -444,7 +528,8 @@ const updateMarketStats = (ticker) => {
         change: safeNumber(ticker.p, data.change),
         high: safeNumber(ticker.h, data.high),
         low: safeNumber(ticker.l, data.low),
-        volume: typeof ticker.v === 'string' ? ticker.v : compactFormatter.format(safeNumber(ticker.v, 0)),
+        volumeBase: safeNumber(ticker.v, data.volumeBase),
+        volumeQuote: safeNumber(ticker.q, data.volumeQuote),
     };
     if (!Number.isFinite(update.price) || update.price <= 0) return;
     Object.assign(data, update);
@@ -452,7 +537,7 @@ const updateMarketStats = (ticker) => {
 };
 
 const animatePrice = (isPositive) => {
-    const priceElement = document.getElementById('currentPrice');
+    const priceElement = document.getElementById('mainPrice');
     priceElement.classList.remove('price-flash-up', 'price-flash-down');
     void priceElement.offsetWidth;
     priceElement.classList.add(isPositive ? 'price-flash-up' : 'price-flash-down');
@@ -469,7 +554,7 @@ const updateKline = (kline) => {
         low: safeNumber(kline.l, lastCandle.low),
         close: safeNumber(kline.c, lastCandle.close),
         time: Number(kline.t),
-        volume: safeNumber(kline.v, lastCandle.volume),
+        volume: normalizeCandleVolume(kline.v, kline.q, kline.c),
     };
 
     if (isActiveCandle) {
@@ -554,7 +639,7 @@ const loadHistoricalCandles = async (interval) => {
 
     try {
         const apiInterval = getBinanceInterval(interval);
-        const params = new URLSearchParams({ symbol: normalizedSymbol, interval: apiInterval, limit: '100' });
+        const params = new URLSearchParams({ symbol: normalizedSymbol, interval: apiInterval, limit: '150' });
         const response = await fetch(`https://api.binance.com/api/v3/klines?${params.toString()}`, {
             signal: controller.signal,
         });
@@ -564,6 +649,8 @@ const loadHistoricalCandles = async (interval) => {
         if (requestId !== historyRequestId) return;
 
         chartData = candles;
+        visibleCandleCount = 40;
+        scrollOffset = 0;
         data.price = candles[candles.length - 1].close;
         data.high = Math.max(...candles.map((candle) => candle.high));
         data.low = Math.min(...candles.map((candle) => candle.low));

@@ -377,7 +377,7 @@
       <section class="config-grid"><article class="panel config-card"><div class="panel-header"><div><h2>Global trade parameters</h2><p>Applies to all enabled pairs</p></div><span class="settings-icon">⚙</span></div>
         <form id="binary-settings-form" class="settings-form compact-form">
           <label class="field-label">Default trade duration<select name="duration" class="select-control"><option>1 minute</option><option selected>3 minutes</option><option>5 minutes</option><option>15 minutes</option></select></label>
-          <label class="field-label">Maximum payout rate<input name="maxPayout" type="number" min="1" max="100" value="95"><small>Percentage of stake returned on a correct prediction.</small></label>
+          <label class="field-label">Maximum payout rate<input name="maxPayout" type="number" min="1" max="100" value="${escapeHtml(localStorageSafeGet('tradeAdmin.maxPayout') || '95')}"><small>Percentage of stake returned on a correct prediction.</small></label>
           <label class="field-label">Maximum open positions<input name="maxPositions" type="number" min="1" value="5000"></label>
           <label class="switch-row"><span><strong>Auto-settle expired trades</strong><small>Settle positions automatically at expiry</small></span><input type="checkbox" name="autoSettle" checked><i></i></label>
           <label class="switch-row"><span><strong>Trading system</strong><small>Allow users to open new positions</small></span><input type="checkbox" name="tradingEnabled" checked><i></i></label>
@@ -577,6 +577,11 @@
       const form = event.currentTarget;
       const payout = Number(form.elements.maxPayout.value);
       if (payout < 1 || payout > 100) return showToast('Maximum payout must be between 1% and 100%.', 'error');
+      try {
+        localStorage.setItem('tradeAdmin.maxPayout', String(payout));
+      } catch (error) {
+        return showToast('Could not save the payout rate in this browser.', 'error');
+      }
       showToast('Binary trading parameters saved.');
     });
   }
