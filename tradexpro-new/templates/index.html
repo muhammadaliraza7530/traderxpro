@@ -26,7 +26,7 @@
     <!-- Center Content: Logo & Loading State -->
     <div class="flex flex-col items-center justify-center space-y-4">
         <!-- App Logo -->
-        <img src="/static/logo/logo.png" onerror="if(!this.dataset.retry){this.dataset.retry=1;this.src='/logo/logo.png';}else if(this.dataset.retry==1){this.dataset.retry=2;this.src='/public/logo/logo.png';}" alt="{{ site_name }} logo" class="w-16 h-16 object-contain animate-spin">
+        <img src="{{ url_for('static', filename='logo/logo.svg') }}" onerror="this.onerror=null;this.src='/logo/logo.svg';" alt="{{ site_name }} logo" class="w-16 h-16 object-contain animate-spin">
         <!-- Loading Text -->
         <div id="loading-status" class="text-[#F0B90B] font-semibold text-base tracking-wide" aria-live="polite">
             Loading...
