@@ -1,0 +1,14 @@
+@tailwind utilities;
+
+.dashboard-white-header,
+.dashboard-white-header::before,
+.dashboard-white-header .nav-bar,
+.dashboard-white-header .nav-bar-content {
+	/* background: #fff !important; */
+	background-image: none !important;
+}
+
+.dashboard-white-header .nav-bar-content,
+.dashboard-white-header .nav-bar-content * {
+	color: #111827 !important;
+}

@@ -1,0 +1,503 @@
+.trade-promo {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-height: 220px;
+    max-height: 376px;
+    aspect-ratio: 2.91 / 1;
+    padding: 38px 48px;
+    overflow: hidden;
+    border: 1px solid #123d7a;
+    border-radius: 22px;
+    color: #fff;
+    background:
+        radial-gradient(ellipse at 78% 55%, rgba(0, 94, 255, .26), transparent 34%),
+        linear-gradient(112deg, #031229 0%, #061a3c 62%, #062655 100%);
+    box-shadow: 0 12px 28px rgba(3, 18, 41, .16);
+    font-family: "Inter", sans-serif;
+}
+
+.trade-promo[hidden] {
+    display: none;
+}
+
+.promo-carousel__dots {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    padding-top: 8px;
+}
+
+.promo-carousel__dot {
+    width: 9px;
+    height: 9px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: #cbd5e1;
+    cursor: pointer;
+    transition: width .18s ease, background-color .18s ease;
+}
+
+.promo-carousel__dot.is-active {
+    width: 24px;
+    border-radius: 999px;
+    background: #1477ff;
+}
+
+.promo-carousel__dot:focus-visible {
+    outline: 2px solid #1477ff;
+    outline-offset: 3px;
+}
+
+.trade-promo__content {
+    position: relative;
+    z-index: 2;
+    width: 58%;
+}
+
+.trade-promo__title {
+    margin: 0;
+    color: #fff;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.14;
+}
+
+.trade-promo__title span {
+    color: #1477ff;
+}
+
+.trade-promo__subtitle {
+    margin: 19px 0 0;
+    color: #e2e9f5;
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 1.35;
+}
+
+.trade-promo__button {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 46px;
+    margin-top: 26px;
+    padding: 0 20px;
+    border-radius: 17px;
+    color: #111827;
+    background: #fff;
+    font-size: 17px;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: 0 5px 14px rgba(0, 0, 0, .16);
+    transition: background-color .18s ease, transform .18s ease;
+}
+
+.trade-promo__button:hover {
+    color: #111827;
+    background: #edf4ff;
+    transform: translateY(-2px);
+}
+
+.trade-promo__button svg {
+    width: 20px;
+    height: 20px;
+}
+
+.trade-promo__art {
+    position: absolute;
+    top: 0;
+    right: 2%;
+    width: 43%;
+    height: 100%;
+    bottom: auto;
+}
+
+.trade-promo__orbit {
+    position: absolute;
+    top: 27%;
+    left: 3%;
+    width: 94%;
+    height: 48%;
+    border: 8px solid rgba(0, 104, 255, .55);
+    border-right-color: rgba(24, 143, 255, .18);
+    border-radius: 50%;
+    transform: rotate(-12deg);
+    box-shadow: 0 0 18px rgba(0, 96, 255, .28);
+}
+
+.trade-promo__phone {
+    position: absolute;
+    top: 14%;
+    left: 42%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 142px;
+    height: 252px;
+    border: 3px solid rgba(167, 211, 255, .72);
+    border-radius: 28px;
+    color: #fff;
+    background: linear-gradient(145deg, #168bff, #0751df 78%);
+    box-shadow: 0 18px 35px rgba(0, 74, 207, .45), inset 0 0 0 1px rgba(255, 255, 255, .14);
+    font-size: 67px;
+    font-weight: 700;
+    transform: rotate(9deg);
+}
+
+.trade-promo__coin {
+    position: absolute;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 72px;
+    height: 72px;
+    border: 3px solid rgba(255, 255, 255, .2);
+    border-radius: 50%;
+    color: #fff;
+    font-size: 34px;
+    font-weight: 700;
+    box-shadow: 0 9px 18px rgba(0, 0, 0, .2);
+}
+
+.trade-promo__coin--bitcoin {
+    top: 34%;
+    left: 11%;
+    background: #f4a623;
+}
+
+.trade-promo__coin--tether {
+    top: 24%;
+    right: 9%;
+    background: #16ae89;
+}
+
+.trade-promo__coin--ethereum {
+    right: 16%;
+    bottom: 15%;
+    background: #386be9;
+}
+
+.trade-promo[data-promo-theme="staking"] .trade-promo__orbit {
+    border-color: rgba(32, 211, 183, .56);
+    border-right-color: rgba(32, 211, 183, .12);
+    box-shadow: 0 0 18px rgba(32, 211, 183, .24);
+}
+
+.trade-promo__stake-coin {
+    position: absolute;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 104px;
+    height: 104px;
+    border: 4px solid rgba(255, 255, 255, .5);
+    border-radius: 50%;
+    color: #fff;
+    font-size: 48px;
+    font-weight: 700;
+    box-shadow: 0 14px 26px rgba(0, 0, 0, .24), inset 0 0 0 5px rgba(255, 255, 255, .13);
+}
+
+.trade-promo__stake-coin--back {
+    top: 30%;
+    left: 9%;
+    background: linear-gradient(145deg, #f5bb45, #d77816);
+    transform: scale(.78);
+}
+
+.trade-promo__stake-coin--middle {
+    top: 10%;
+    right: 8%;
+    background: linear-gradient(145deg, #35d9b0, #087e8b);
+    transform: scale(.82);
+}
+
+.trade-promo__stake-coin--front {
+    right: 30%;
+    bottom: 7%;
+    background: linear-gradient(145deg, #168bff, #0751df);
+}
+
+.trade-promo__reward-mark {
+    position: absolute;
+    z-index: 3;
+    top: 18%;
+    left: 39%;
+    display: grid;
+    width: 42px;
+    height: 42px;
+    place-items: center;
+    border: 2px solid rgba(255, 255, 255, .65);
+    border-radius: 50%;
+    color: #fff;
+    background: #15ad87;
+    font-size: 29px;
+    font-weight: 700;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, .2);
+}
+
+.trade-promo[data-promo-theme="kyc"] .trade-promo__orbit {
+    border-color: rgba(69, 154, 255, .58);
+    border-right-color: rgba(69, 154, 255, .12);
+}
+
+.trade-promo__document {
+    position: absolute;
+    top: 18%;
+    left: 22%;
+    display: flex;
+    flex-direction: column;
+    gap: 13px;
+    width: 142px;
+    height: 190px;
+    padding: 22px 18px;
+    border: 2px solid rgba(190, 220, 255, .9);
+    border-radius: 17px;
+    background: linear-gradient(145deg, #f8fbff, #cfe3ff);
+    box-shadow: 0 16px 30px rgba(0, 0, 0, .24);
+    transform: rotate(-8deg);
+}
+
+.trade-promo__document-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(145deg, #65adff, #1765d8);
+}
+
+.trade-promo__document-line {
+    width: 100%;
+    height: 8px;
+    border-radius: 5px;
+    background: #8bb9f0;
+}
+
+.trade-promo__document-line--short {
+    width: 62%;
+}
+
+.trade-promo__shield {
+    position: absolute;
+    z-index: 3;
+    top: 30%;
+    right: 12%;
+    display: grid;
+    width: 118px;
+    height: 118px;
+    place-items: center;
+    border: 2px solid rgba(145, 199, 255, .8);
+    border-radius: 32px;
+    color: #a6d4ff;
+    background: linear-gradient(145deg, #168bff, #0751df 78%);
+    box-shadow: 0 16px 32px rgba(0, 65, 180, .4);
+    transform: rotate(8deg);
+}
+
+.trade-promo__shield svg {
+    width: 76px;
+    height: 76px;
+}
+
+@media (max-width: 900px) {
+    .trade-promo {
+        padding: 28px 32px;
+    }
+
+    .trade-promo__title {
+        font-size: 40px;
+    }
+
+    .trade-promo__subtitle {
+        font-size: 18px;
+    }
+
+    .trade-promo__phone {
+        width: 104px;
+        height: 184px;
+        border-radius: 23px;
+        font-size: 52px;
+    }
+
+    .trade-promo__coin {
+        width: 56px;
+        height: 56px;
+        font-size: 27px;
+    }
+
+    .trade-promo__stake-coin {
+        width: 82px;
+        height: 82px;
+        font-size: 38px;
+    }
+
+    .trade-promo__reward-mark {
+        width: 34px;
+        height: 34px;
+        font-size: 23px;
+    }
+
+    .trade-promo__document {
+        width: 112px;
+        height: 154px;
+        gap: 10px;
+        padding: 17px 14px;
+    }
+
+    .trade-promo__shield {
+        width: 94px;
+        height: 94px;
+        border-radius: 27px;
+    }
+
+    .trade-promo__shield svg {
+        width: 62px;
+        height: 62px;
+    }
+}
+
+@media (max-width: 600px) {
+    .trade-promo {
+        min-height: 150px;
+        aspect-ratio: auto;
+        padding: 22px 20px;
+        border-radius: 18px;
+    }
+
+    .trade-promo__content {
+        width: 64%;
+    }
+
+    .trade-promo__title {
+        font-size: 18px;
+        line-height: 1.16;
+    }
+
+    .trade-promo__subtitle {
+        margin-top: 10px;
+        font-size: 11px;
+    }
+
+    .trade-promo__button {
+        min-height: 32px;
+        gap: 8px;
+        margin-top: 17px;
+        padding: 0 14px;
+        border-radius: 12px;
+        font-size: 12px;
+    }
+
+    .trade-promo__button svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    .trade-promo__art {
+        right: 5%;
+        width: 33%;
+    }
+
+    .trade-promo__orbit {
+        top: 32%;
+        left: -8%;
+        width: 110%;
+        height: 37%;
+        border-width: 5px;
+    }
+
+    .trade-promo__phone {
+        top: 10%;
+        left: 36%;
+        width: 67px;
+        height: 126px;
+        border-width: 2px;
+        border-radius: 17px;
+        font-size: 37px;
+    }
+
+    .trade-promo__coin {
+        width: 38px;
+        height: 38px;
+        border-width: 2px;
+        font-size: 19px;
+    }
+
+    .trade-promo__coin--bitcoin {
+        top: 31%;
+        left: 0;
+    }
+
+    .trade-promo__coin--tether {
+        top: 23%;
+        right: 0;
+    }
+
+    .trade-promo__coin--ethereum {
+        right: 8%;
+        bottom: 18%;
+    }
+
+    .trade-promo__stake-coin {
+        width: 51px;
+        height: 51px;
+        border-width: 2px;
+        font-size: 25px;
+        box-shadow: 0 8px 14px rgba(0, 0, 0, .22), inset 0 0 0 3px rgba(255, 255, 255, .13);
+    }
+
+    .trade-promo__stake-coin--back {
+        left: 2%;
+    }
+
+    .trade-promo__stake-coin--middle {
+        right: 1%;
+    }
+
+    .trade-promo__stake-coin--front {
+        right: 29%;
+        bottom: 10%;
+    }
+
+    .trade-promo__reward-mark {
+        top: 15%;
+        left: 38%;
+        width: 26px;
+        height: 26px;
+        font-size: 18px;
+    }
+
+    .trade-promo__document {
+        top: 20%;
+        left: 16%;
+        width: 72px;
+        height: 102px;
+        gap: 7px;
+        padding: 12px 9px;
+        border-radius: 12px;
+    }
+
+    .trade-promo__document-avatar {
+        width: 22px;
+        height: 22px;
+    }
+
+    .trade-promo__document-line {
+        height: 5px;
+    }
+
+    .trade-promo__shield {
+        top: 34%;
+        right: 5%;
+        width: 65px;
+        height: 65px;
+        border-radius: 19px;
+    }
+
+    .trade-promo__shield svg {
+        width: 45px;
+        height: 45px;
+    }
+}

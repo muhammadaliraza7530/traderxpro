@@ -1,0 +1,14 @@
+.timeline-item[data-v-66f646c4] {
+    position: relative
+}
+
+.timeline-item[data-v-66f646c4]:not(:last-of-type):before {
+    content: "";
+    position: absolute;
+    top: 30px;
+    left: 9px;
+    width: 2px;
+    height: calc(100% - 30px);
+    background: var(--bg);
+    border-left: 2px dashed var(--primary)
+}

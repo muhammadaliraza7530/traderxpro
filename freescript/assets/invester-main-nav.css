@@ -1,0 +1,86 @@
+.tab-bar-wrap-44,
+.tab-bar-wrap-2 {
+    position: fixed !important;
+    display: block !important;
+    z-index: 50 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    box-sizing: border-box;
+    padding: 8px 16px calc(8px + env(safe-area-inset-bottom)) !important;
+    border-top: 1px solid #f1f5f9;
+    background: #fff;
+    box-shadow: 0 -6px 20px rgba(15, 23, 42, .06);
+}
+
+.layout-tab-bar {
+    padding-bottom: calc(76px + env(safe-area-inset-bottom)) !important;
+}
+
+body.has-invest-main-nav {
+    padding-bottom: calc(76px + env(safe-area-inset-bottom)) !important;
+}
+
+.tab-bar-wrap-44 .tab-bar,
+.tab-bar-wrap-2 .tab-bar {
+    display: grid !important;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    width: 100%;
+}
+
+.tab-bar-wrap-44 .tab-item,
+.tab-bar-wrap-2 .tab-item {
+    width: auto !important;
+    min-width: 0;
+}
+
+.tab-bar-wrap-44 .tab-item-inner,
+.tab-bar-wrap-2 .tab-item-inner {
+    display: flex;
+    min-height: 48px;
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    color: #64748b;
+    text-decoration: none;
+}
+
+.tab-bar-wrap-44 .tab-item-inner.active,
+.tab-bar-wrap-44 .tab-item-inner[aria-current="page"],
+.tab-bar-wrap-2 .tab-item-inner.active,
+.tab-bar-wrap-2 .tab-item-inner[aria-current="page"] {
+    color: #154de0;
+}
+
+.invest-main-nav__icon {
+    display: block;
+    width: 21px;
+    height: 21px;
+    flex: 0 0 21px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.tab-bar-wrap-44 .tab-item-label,
+.tab-bar-wrap-2 .tab-item-label {
+    overflow: hidden;
+    max-width: 100%;
+    color: inherit;
+    font-size: 10px;
+    font-weight: 500;
+    line-height: 1.15;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.tab-bar-wrap-44 .tab-item-inner:focus-visible,
+.tab-bar-wrap-2 .tab-item-inner:focus-visible {
+    outline: 2px solid #154de0;
+    outline-offset: -2px;
+}

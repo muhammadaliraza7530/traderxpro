@@ -1,0 +1,16 @@
+.recharge-item[data-v-f26e5428] {
+    border-bottom: 1px dashed var(--text-gray);
+    padding: 15px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between
+}
+
+.recharge-item[data-v-f26e5428]:last-child {
+    border-bottom: 0
+}
+
+.recharge-item .name[data-v-f26e5428] {
+    color: var(--btn-text);
+    margin: 0 10px
+}
