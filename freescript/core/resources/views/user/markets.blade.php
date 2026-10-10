@@ -176,7 +176,7 @@
                         </button>
                         <button id="addOtherPairsBtn" type="button" class="mt-2 w-full cursor-pointer rounded !border-0 !bg-transparent px-4 py-1 text-center text-[11px] font-medium text-blue-600 transition-colors hover:text-blue-700" data-add-pairs>Add Other Pairs</button>
                     </div>
-                </div>
+                </div> 
 
                 <div id="cryptoViewContainer" class="hidden min-h-screen bg-white px-3 pb-24 pt-3" data-market-view="Crypto">
                     <div class="mb-3 flex gap-5 overflow-x-auto border-b border-slate-100 pb-1 text-sm font-bold text-slate-400" role="tablist" aria-label="Crypto market types" style="scrollbar-width: none;">
