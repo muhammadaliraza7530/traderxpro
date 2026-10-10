@@ -32,7 +32,8 @@
         <script>
             window.investMainNavigation = {
                 home: @json(route('user.home')),
-                markets: @json(route('user.home') . '#markets'),
+                markets: @json(route('user.markets')),
+                activeMarkets: @json(request()->routeIs('user.markets')),
                 trade: @json(route('plan')),
                 staking: @json(route('user.staking.index')),
                 wallet: @json(route('user.deposit.index')),

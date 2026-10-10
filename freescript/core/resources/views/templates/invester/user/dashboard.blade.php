@@ -317,49 +317,122 @@ function carousel() {
                         <!---->
                         @php
                             $marketPairs = [
-                                ['symbol' => 'BTC', 'price' => '$62,822.40', 'change' => '+2.45%', 'path' => 'M2 23 L12 18 L22 20 L33 13 L44 16 L57 8 L74 5'],
-                                ['symbol' => 'ETH', 'price' => '$3,420.20', 'change' => '+1.85%', 'path' => 'M2 24 L14 20 L24 21 L36 14 L48 16 L60 9 L74 6'],
-                                ['symbol' => 'BNB', 'price' => '$580.20', 'change' => '-0.65%', 'path' => 'M2 7 L14 10 L25 9 L37 16 L48 14 L61 23 L74 26'],
-                                ['symbol' => 'SOL', 'price' => '$145.20', 'change' => '+3.10%', 'path' => 'M2 25 L14 21 L24 23 L36 12 L49 16 L60 8 L74 4'],
+                                [
+                                    'symbol' => 'BNB',
+                                    'name' => 'BNB',
+                                    'leverage' => '10x',
+                                    'volume' => '74.91M',
+                                    'image' => 'https://assets.coincap.io/assets/icons/bnb@2x.png',
+                                    'price' => '$741.06',
+                                    'localPrice' => 'Rs205,214.33',
+                                    'change' => '+2.94%',
+                                ],
+                                [
+                                    'symbol' => 'BTC',
+                                    'name' => 'Bitcoin',
+                                    'leverage' => '5x',
+                                    'volume' => '1.08B',
+                                    'image' => 'https://assets.coincap.io/assets/icons/btc@2x.png',
+                                    'price' => '$62,822.40',
+                                    'localPrice' => 'Rs17,436,530.00',
+                                    'change' => '+1.82%',
+                                ],
+                                [
+                                    'symbol' => 'ETH',
+                                    'name' => 'Ethereum',
+                                    'leverage' => '5x',
+                                    'volume' => '842.6M',
+                                    'image' => 'https://assets.coincap.io/assets/icons/eth@2x.png',
+                                    'price' => '$3,420.20',
+                                    'localPrice' => 'Rs949,095.00',
+                                    'change' => '-0.65%',
+                                ],
+                                [
+                                    'symbol' => 'SOL',
+                                    'name' => 'Solana',
+                                    'leverage' => '20x',
+                                    'volume' => '438.12M',
+                                    'image' => 'https://assets.coincap.io/assets/icons/sol@2x.png',
+                                    'price' => '$145.20',
+                                    'localPrice' => 'Rs40,250.00',
+                                    'change' => '+3.10%',
+                                ],
+                                [
+                                    'symbol' => 'ZEC',
+                                    'name' => 'Zcash',
+                                    'leverage' => '10x',
+                                    'volume' => '18.46M',
+                                    'image' => 'https://assets.coincap.io/assets/icons/zec@2x.png',
+                                    'price' => '$46.70',
+                                    'localPrice' => 'Rs12,940.00',
+                                    'change' => '+2.16%',
+                                ],
+                                [
+                                    'symbol' => 'SYN',
+                                    'name' => 'SynFutures',
+                                    'leverage' => '5x',
+                                    'volume' => '12.25M',
+                                    'image' => asset('core/public/images/coins/syn.svg'),
+                                    'price' => '$1.54',
+                                    'localPrice' => 'Rs427.00',
+                                    'change' => '+4.28%',
+                                ],
+                                [
+                                    'symbol' => 'XRP',
+                                    'name' => 'XRP',
+                                    'leverage' => '10x',
+                                    'volume' => '211.94M',
+                                    'image' => 'https://assets.coincap.io/assets/icons/xrp@2x.png',
+                                    'price' => '$0.62',
+                                    'localPrice' => 'Rs172.00',
+                                    'change' => '-1.24%',
+                                ],
                             ];
                         @endphp
                         <section id="markets" class="mt-5">
-                            <div class="mb-3 flex items-center justify-between px-1">
-                                <h2 class="text-base font-bold text-gray-900">Market Trends</h2>
-                                <a href="#market-pairs" class="inline-flex items-center gap-1 text-sm font-semibold text-blue-600 hover:text-blue-700">
-                                    View All
-                                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14m-6-6 6 6-6 6" />
-                                    </svg>
-                                </a>
-                            </div>
-
-                            <div id="market-pairs" class="overflow-hidden rounded-2xl  shadow-sm">
-                                <div class="flex items-center justify-between border-b border-gray-100 bg-gray-50/50 px-4 py-2.5 text-xs font-semibold uppercase tracking-wider text-gray-500">
-                                    <span class="w-[27%]">Asset</span>
-                                    <span class="w-[48%] text-center">Price / Chart</span>
-                                    <span class="w-[25%] text-right">24h Change</span>
+                            <div class="rounded-3xl bg-white ">
+                                <div class="mb-4 flex items-center justify-between">
+                                    <h2 class="text-base font-bold text-slate-900">Market Trends</h2>
+                                    <a href="#market-pairs" class="inline-flex items-center gap-1 text-xs font-semibold text-blue-600 transition-colors hover:text-blue-700">
+                                        View All →
+                                    </a>
                                 </div>
-                                @foreach ($marketPairs as $pair)
-                                    @php
-                                        $changeValue = (float) str_replace('%', '', $pair['change']);
-                                        $isPositive = $changeValue > 0;
-                                    @endphp
-                                    <article class="flex items-center justify-between border-b border-gray-50 px-4 py-3 transition-all last:border-none hover:bg-gray-50/80">
-                                        <h3 class="w-[27%] min-w-0 truncate text-sm font-bold text-gray-900">{{ $pair['symbol'] }}/USDT</h3>
 
-                                        <div class="flex w-[48%] min-w-0 flex-col items-center justify-center gap-0.5 text-center">
-                                            <svg class="h-6 w-12 shrink-0" viewBox="0 0 76 32" fill="none" aria-hidden="true">
-                                                <path d="{{ $pair['path'] }}" class="{{ $isPositive ? 'stroke-emerald-500' : 'stroke-rose-500' }}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
-                                            </svg>
-                                            <p class="whitespace-nowrap text-sm font-bold text-gray-900">{{ $pair['price'] }}</p>
-                                        </div>
-
-                                        <span class="inline-flex w-[25%] shrink-0 justify-end whitespace-nowrap rounded-lg px-2.5 py-1 text-xs font-bold {{ $isPositive ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600' }}">
-                                            {{ $pair['change'] }}
-                                        </span>
-                                    </article>
-                                @endforeach
+                                <div id="market-pairs" class="w-full min-w-0 overflow-hidden rounded-2xl">
+                                    <div class="flex w-full items-center justify-between border-b border-slate-100 py-2 text-[10px] font-semibold text-slate-400">
+                                        <span class="w-5/12">Name / Vol <span aria-hidden="true">⬍</span></span>
+                                        <span class="w-4/12 text-right">Last Price <span aria-hidden="true">⬍</span></span>
+                                        <span class="w-3/12 text-right">24h Chg <span aria-hidden="true">⬍</span></span>
+                                    </div>
+                                    <div class="w-full min-w-0 divide-y divide-slate-100">
+                                        @foreach ($marketPairs as $pair)
+                                            @php
+                                                $changeValue = (float) str_replace('%', '', $pair['change']);
+                                                $isPositive = $changeValue > 0;
+                                            @endphp
+                                            <article class="flex w-full min-w-0 items-center justify-between py-3 transition-colors hover:bg-slate-50/80">
+                                                <div class="flex w-5/12 min-w-0 items-center gap-2">
+                                                    <img src="{{ $pair['image'] }}" alt="{{ $pair['symbol'] }} logo" class="h-7 w-7 shrink-0 rounded-full object-contain" loading="lazy" />
+                                                    <div class="min-w-0">
+                                                        <div class="flex min-w-0 items-center gap-0.5 whitespace-nowrap leading-tight">
+                                                            <span class="text-xs font-bold text-slate-900">{{ $pair['symbol'] }}</span>
+                                                            <span class="text-[10px] text-slate-400">/USDT</span>
+                                                            <span class="ml-0.5 rounded bg-slate-100 px-1 text-[9px] font-medium text-slate-500">{{ $pair['leverage'] }}</span>
+                                                        </div>
+                                                        <div class="mt-0.5 truncate text-[10px] text-slate-400">{{ $pair['name'] }} <span class="ml-1">{{ $pair['volume'] }}</span></div>
+                                                    </div>
+                                                </div>
+                                                <div class="w-4/12 min-w-0 text-right">
+                                                    <div class="truncate text-xs font-bold leading-tight text-slate-900">{{ $pair['price'] }}</div>
+                                                    <div class="mt-0.5 truncate text-[10px] text-slate-400">{{ $pair['localPrice'] }}</div>
+                                                </div>
+                                                <div class="w-3/12 text-right">
+                                                    <span class="inline-block w-full max-w-[76px] whitespace-nowrap rounded-lg px-1.5 py-1.5 text-center text-[10px] font-bold text-white {{ $isPositive ? 'bg-[#0ECB81]' : 'bg-[#F6465D]' }}">{{ $pair['change'] }}</span>
+                                                </div>
+                                            </article>
+                                        @endforeach
+                                    </div>
+                                </div>
                             </div>
                         </section>
 

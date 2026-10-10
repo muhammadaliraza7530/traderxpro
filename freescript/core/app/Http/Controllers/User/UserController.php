@@ -20,6 +20,14 @@ use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
+    public function markets()
+    {
+        $pageTitle = 'Markets';
+        $activeTab = 'markets';
+
+        return view('user.markets', compact('pageTitle', 'activeTab'));
+    }
+
     public function home()
     {
         $data['pageTitle']         = 'Dashboard';

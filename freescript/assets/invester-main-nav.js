@@ -42,7 +42,7 @@
         }
 
         if (key === 'markets') {
-            return currentPath === routePath(destinations.home) && window.location.hash === '#markets';
+            return destinations.activeMarkets || currentPath === routePath(destinations.markets);
         }
 
         if (key === 'wallet') {
@@ -79,11 +79,14 @@
             wrapper.className = 'tab-item';
 
             const link = document.createElement('a');
-            link.className = 'tab-item-inner';
+            const active = isActive(item.key, currentPath);
+            link.className = active
+                ? 'tab-item-inner text-blue-600 font-semibold'
+                : 'tab-item-inner text-slate-400';
             link.href = destinations[item.key];
             link.setAttribute('aria-label', item.label);
 
-            if (isActive(item.key, currentPath)) {
+            if (active) {
                 link.classList.add('active');
                 link.setAttribute('aria-current', 'page');
             }

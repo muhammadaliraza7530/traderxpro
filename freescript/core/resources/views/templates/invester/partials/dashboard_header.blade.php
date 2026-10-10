@@ -1,4 +1,4 @@
-<header class="sticky top-0 z-50 ml-[calc(50%_-_50vw)] flex w-screen items-center justify-between border-b border-gray-100 bg-white px-4 py-3 font-sans shadow-sm">
+<header class="sticky top-0 z-50 flex w-full items-center justify-between border-b border-gray-100 bg-white px-4 py-3 font-sans shadow-sm">
     <a href="{{ route('user.home') }}" class="flex items-center gap-2.5">
         <span class="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-600 font-bold text-white shadow-md shadow-blue-500/20">
             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">

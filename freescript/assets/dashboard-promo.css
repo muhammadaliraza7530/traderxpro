@@ -1,10 +1,22 @@
+.promo-carousel {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
 .trade-promo {
     position: relative;
     display: flex;
     align-items: center;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
     min-height: 220px;
     max-height: 376px;
-    aspect-ratio: 2.91 / 1;
+    aspect-ratio: auto;
     padding: 38px 48px;
     overflow: hidden;
     border: 1px solid #123d7a;
@@ -359,7 +371,7 @@
     }
 }
 
-@media (max-width: 600px) {
+@container (max-width: 600px) {
     .trade-promo {
         min-height: 150px;
         aspect-ratio: auto;
