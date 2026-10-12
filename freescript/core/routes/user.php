@@ -53,6 +53,7 @@ Route::middleware('auth')->name('user.')->group(function () {
             Route::controller('UserController')->group(function () {
                 Route::get('dashboard', 'home')->name('home');
                 Route::get('markets', 'markets')->name('markets');
+                Route::get('trade', 'trade')->name('trade');
 
                 //2FA
                 Route::get('twofactor', 'show2faForm')->name('twofactor');

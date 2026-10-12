@@ -8433,7 +8433,7 @@
     border-radius: 20px 20px 0 0
 }
 
-.index-wrap .notice-info[data-v-6cee72ec] {
+.index-wrap .notice-info[data-v-6cee72ec] { 
     position: relative;
     z-index: 1;
     display: flex;

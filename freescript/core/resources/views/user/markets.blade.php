@@ -125,7 +125,7 @@
         ];
     @endphp
 
-    <main class="min-h-screen bg-slate-50 px-4 pb-8 sm:px-6" data-active-tab="{{ $activeTab }}">
+    <main class="min-h-screen bg-slate-50 px-4 pb-8 sm:px-6" data-active-tab="{{ $activeTab }}" data-trade-url="{{ route('user.trade') }}">
         <div class="mx-auto w-full max-w-3xl">
             <header class="sticky top-0 z-20 -mx-4 bg-slate-50/95 pt-2 backdrop-blur sm:-mx-6 sm:px-6">
                 <div role="search" class="flex h-12 items-center gap-3 rounded-2xl border border-slate-200/80 bg-white px-4 text-slate-400 shadow-sm transition focus-within:border-blue-300 focus-within:ring-4 focus-within:ring-blue-100/70">
@@ -361,5 +361,5 @@
         </div>
     </main>
 
-    <script src="{{ asset('assets/markets.js') }}?v=options-fallback-1"></script>
+    <script src="{{ asset('assets/markets.js') }}?v=market-trade-1"></script>
 @endsection

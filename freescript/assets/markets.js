@@ -4,6 +4,42 @@
     const marketRoot = document.querySelector('[data-market-grid]')?.closest('main');
     if (!marketRoot) return;
 
+    const getMarketRowValue = (row, attribute, selectors, fallback) => {
+        const displayedValue = selectors
+            .map((selector) => row.querySelector(selector)?.textContent.trim())
+            .find((value) => value && !['--', 'Loading...', 'Unavailable'].includes(value));
+
+        return displayedValue || row.getAttribute(attribute) || fallback;
+    };
+
+    marketRoot.addEventListener('click', (event) => {
+        if (!(event.target instanceof Element)) return;
+
+        const row = event.target.closest('.market-row-item');
+        if (!row || !marketRoot.contains(row) || event.target.closest('button, a, input, select, textarea')) return;
+
+        const symbol = row.getAttribute('data-symbol') || 'AAVE';
+        const price = getMarketRowValue(row, 'data-price', [
+            '[data-crypto-price]',
+            '[data-futures-mark-price]',
+            '[data-futures-last-price]',
+            '[data-coinm-mark-price]',
+            '[data-coinm-last-price]',
+            ':scope > div:nth-child(2) > div:first-child',
+        ], '167.75');
+        const change = getMarketRowValue(row, 'data-change', [
+            '[data-crypto-change]',
+            '[data-futures-change]',
+            '[data-coinm-change]',
+            ':scope > div:nth-child(3) span',
+        ], '-0.37%');
+        const tradeUrl = new URL(marketRoot.dataset.tradeUrl, window.location.href);
+        tradeUrl.searchParams.set('symbol', symbol);
+        tradeUrl.searchParams.set('price', price);
+        tradeUrl.searchParams.set('change', change);
+        window.location.href = tradeUrl.toString();
+    });
+
     const cards = Array.from(marketRoot.querySelectorAll('[data-market-card]'));
     const tabs = Array.from(marketRoot.querySelectorAll('[data-market-tab]'));
     const search = marketRoot.querySelector('[data-market-search]');
@@ -191,7 +227,7 @@
             const logoUrl = asset.image || getAssetLogo(asset.symbol);
             const fallbackLogo = `https://ui-avatars.com/api/?name=${encodeURIComponent(asset.symbol)}&background=2563EB&color=fff&size=128`;
             return `
-            <article class="flex items-center justify-between py-3 transition-colors hover:bg-slate-50/80" data-crypto-row data-crypto-symbol="${escapeHtml(asset.symbol.toLowerCase())}" data-crypto-name="${escapeHtml(asset.name.toLowerCase())}" data-crypto-segment="${escapeHtml(asset.symbol === 'SOL' ? 'Solana' : 'All')}">
+            <article class="market-row-item flex cursor-pointer items-center justify-between py-3 transition-colors hover:bg-slate-50/80" data-crypto-row data-symbol="${escapeHtml(asset.symbol)}" data-price="${escapeHtml(asset.price || '')}" data-change="${escapeHtml(asset.change || '')}" data-crypto-symbol="${escapeHtml(asset.symbol.toLowerCase())}" data-crypto-name="${escapeHtml(asset.name.toLowerCase())}" data-crypto-segment="${escapeHtml(asset.symbol === 'SOL' ? 'Solana' : 'All')}">
                 <div class="flex w-5/12 min-w-0 items-center gap-2">
                     <span class="relative h-7 w-7 shrink-0 overflow-hidden rounded-full bg-slate-100">
                         <span class="hidden h-full w-full items-center justify-center text-[10px] font-bold text-slate-500" data-crypto-fallback>${escapeHtml(asset.symbol.slice(0, 1))}</span>
@@ -235,7 +271,7 @@
             const fallbackLogo = `https://ui-avatars.com/api/?name=${encodeURIComponent(asset.symbol)}&background=2563EB&color=fff&size=128`;
 
             return `
-                <article class="flex items-center justify-between border-b border-slate-50 py-3 transition-colors hover:bg-slate-50/80" data-bstocks-row data-bstocks-symbol="${escapeHtml(asset.symbol.toLowerCase())}" data-bstocks-name="${escapeHtml(asset.name.toLowerCase())}">
+                <article class="market-row-item flex cursor-pointer items-center justify-between border-b border-slate-50 py-3 transition-colors hover:bg-slate-50/80" data-bstocks-row data-symbol="${escapeHtml(asset.symbol)}" data-price="${escapeHtml(asset.price || '')}" data-change="${escapeHtml(asset.change || '')}" data-bstocks-symbol="${escapeHtml(asset.symbol.toLowerCase())}" data-bstocks-name="${escapeHtml(asset.name.toLowerCase())}">
                     <div class="flex w-5/12 min-w-0 items-center gap-2">
                         <img
                             src="${escapeHtml(logoUrl)}"
@@ -277,7 +313,7 @@
                 const fallbackLogo = `https://ui-avatars.com/api/?name=${encodeURIComponent(asset.symbol)}&background=2563EB&color=fff&size=128`;
 
                 return `
-                    <article class="flex items-center justify-between border-b border-slate-50 py-3 transition-colors hover:bg-slate-50/80" data-tradfi-row data-tradfi-symbol="${escapeHtml(asset.symbol.toLowerCase())}" data-tradfi-name="${escapeHtml(asset.name.toLowerCase())}">
+                    <article class="market-row-item flex cursor-pointer items-center justify-between border-b border-slate-50 py-3 transition-colors hover:bg-slate-50/80" data-tradfi-row data-symbol="${escapeHtml(asset.symbol)}" data-price="${escapeHtml(asset.price || '')}" data-change="${escapeHtml(asset.change || '')}" data-tradfi-symbol="${escapeHtml(asset.symbol.toLowerCase())}" data-tradfi-name="${escapeHtml(asset.name.toLowerCase())}">
                         <div class="flex w-5/12 min-w-0 items-center gap-2">
                             <img
                                 src="${escapeHtml(logoUrl)}"
@@ -317,7 +353,7 @@
             const quote = asset.quote || '/USDT';
 
             return `
-                <article class="flex items-center justify-between border-b border-slate-50 py-3 transition-colors hover:bg-slate-50/80" data-tradfi-spot-row data-tradfi-spot-symbol="${escapeHtml(asset.symbol.toLowerCase())}" data-tradfi-spot-name="${escapeHtml(asset.name.toLowerCase())}">
+                <article class="market-row-item flex cursor-pointer items-center justify-between border-b border-slate-50 py-3 transition-colors hover:bg-slate-50/80" data-tradfi-spot-row data-symbol="${escapeHtml(asset.symbol)}" data-price="${escapeHtml(asset.price || '')}" data-change="${escapeHtml(asset.change || '')}" data-tradfi-spot-symbol="${escapeHtml(asset.symbol.toLowerCase())}" data-tradfi-spot-name="${escapeHtml(asset.name.toLowerCase())}">
                     <div class="flex w-5/12 min-w-0 items-center gap-2">
                         <img src="${escapeHtml(logoUrl)}" alt="${escapeHtml(asset.symbol)} logo" class="h-7 w-7 shrink-0 rounded-full bg-slate-100 object-contain" loading="lazy" onerror="this.onerror=null; this.src='${fallbackLogo}';">
                         <div class="min-w-0">
@@ -350,7 +386,7 @@
             const fallbackLogo = `https://ui-avatars.com/api/?name=${encodeURIComponent(asset.symbol)}&background=2563EB&color=fff&size=128`;
 
             return `
-                <article class="flex items-center justify-between border-b border-slate-50 py-3 transition-colors hover:bg-slate-50/80" data-tradfi-futures-row data-tradfi-futures-symbol="${escapeHtml(asset.symbol.toLowerCase())}" data-tradfi-futures-name="${escapeHtml(asset.name.toLowerCase())}">
+                <article class="market-row-item flex cursor-pointer items-center justify-between border-b border-slate-50 py-3 transition-colors hover:bg-slate-50/80" data-tradfi-futures-row data-symbol="${escapeHtml(asset.symbol)}" data-price="${escapeHtml(asset.price || '')}" data-change="${escapeHtml(asset.change || '')}" data-tradfi-futures-symbol="${escapeHtml(asset.symbol.toLowerCase())}" data-tradfi-futures-name="${escapeHtml(asset.name.toLowerCase())}">
                     <div class="flex w-5/12 min-w-0 items-center gap-2">
                         <img src="${escapeHtml(asset.logo)}" alt="${escapeHtml(asset.name)} logo" class="h-7 w-7 shrink-0 rounded-full bg-slate-100 object-contain" loading="lazy" onerror="this.onerror=null; this.src='${fallbackLogo}';">
                         <div class="min-w-0">
@@ -381,7 +417,7 @@
                 : '';
 
             return `
-                <article class="flex items-center justify-between border-b border-slate-50 py-3 transition-colors hover:bg-slate-50/80" data-alpha-row data-alpha-symbol="${escapeHtml(asset.symbol.toLowerCase())}">
+                <article class="market-row-item flex cursor-pointer items-center justify-between border-b border-slate-50 py-3 transition-colors hover:bg-slate-50/80" data-alpha-row data-symbol="${escapeHtml(asset.symbol)}" data-price="${escapeHtml(asset.price || '')}" data-change="${escapeHtml(asset.change || '')}" data-alpha-symbol="${escapeHtml(asset.symbol.toLowerCase())}">
                     <div class="flex w-5/12 min-w-0 items-center gap-2">
                         <img src="${escapeHtml(asset.logo)}" alt="${escapeHtml(asset.symbol)} logo" class="h-7 w-7 shrink-0 rounded-full bg-slate-100 object-contain" loading="lazy" onerror="this.onerror=null; this.src='${fallbackLogo}';">
                         <div class="min-w-0">
@@ -436,7 +472,7 @@
             const fallbackLogo = `https://ui-avatars.com/api/?name=${encodeURIComponent(asset.symbol)}&background=2563EB&color=fff&size=128`;
 
             return `
-                <article class="flex items-center justify-between border-b border-slate-50 py-3 transition-colors hover:bg-slate-50/80" data-tcommodities-row data-tcommodities-symbol="${escapeHtml(asset.symbol.toLowerCase())}" data-tcommodities-name="${escapeHtml(asset.name.toLowerCase())}">
+                <article class="market-row-item flex cursor-pointer items-center justify-between border-b border-slate-50 py-3 transition-colors hover:bg-slate-50/80" data-tcommodities-row data-symbol="${escapeHtml(asset.symbol)}" data-price="${escapeHtml(asset.price || '')}" data-change="${escapeHtml(asset.change || '')}" data-tcommodities-symbol="${escapeHtml(asset.symbol.toLowerCase())}" data-tcommodities-name="${escapeHtml(asset.name.toLowerCase())}">
                     <div class="flex w-5/12 min-w-0 items-center gap-2">
                         <img
                             src="${escapeHtml(logoUrl)}"
@@ -469,7 +505,7 @@
 
     const renderUsdMarginedRows = () => {
         usdMarginedRows.innerHTML = usdMarginedData.map((asset) => `
-            <article class="flex cursor-pointer items-center justify-between border-b border-slate-50 py-3 transition-colors hover:bg-slate-50/80" data-futures-row data-futures-symbol="${escapeHtml(asset.symbol.toLowerCase())}" data-futures-name="${escapeHtml(asset.name.toLowerCase())}" data-futures-filter-value="${escapeHtml(asset.filter)}">
+            <article class="market-row-item flex cursor-pointer items-center justify-between border-b border-slate-50 py-3 transition-colors hover:bg-slate-50/80" data-futures-row data-symbol="${escapeHtml(asset.symbol)}USDT" data-price="${escapeHtml(asset.price || '')}" data-change="${escapeHtml(asset.change || '')}" data-futures-symbol="${escapeHtml(asset.symbol.toLowerCase())}" data-futures-name="${escapeHtml(asset.name.toLowerCase())}" data-futures-filter-value="${escapeHtml(asset.filter)}">
                 <div class="flex w-5/12 min-w-0 items-center gap-2.5">
                     <span class="relative h-7 w-7 shrink-0 overflow-hidden rounded-full bg-slate-100">
                         <span class="hidden h-full w-full items-center justify-center text-[10px] font-bold text-slate-500" data-futures-fallback>${escapeHtml(asset.symbol.slice(0, 1))}</span>
@@ -505,7 +541,7 @@
 
     const renderCoinMarginedRows = () => {
         coinMarginedRows.innerHTML = coinMarginedData.map((asset) => `
-            <article class="flex cursor-pointer items-center justify-between border-b border-slate-50 py-3 transition-colors hover:bg-slate-50/80" data-coinm-row data-coinm-symbol="${escapeHtml(asset.symbol.toLowerCase())}" data-coinm-name="${escapeHtml(asset.name.toLowerCase())}" data-coinm-filters="${escapeHtml(asset.filters.join(','))}">
+            <article class="market-row-item flex cursor-pointer items-center justify-between border-b border-slate-50 py-3 transition-colors hover:bg-slate-50/80" data-coinm-row data-symbol="${escapeHtml(asset.symbol)}USD" data-price="${escapeHtml(asset.price || '')}" data-change="${escapeHtml(asset.change || '')}" data-coinm-symbol="${escapeHtml(asset.symbol.toLowerCase())}" data-coinm-name="${escapeHtml(asset.name.toLowerCase())}" data-coinm-filters="${escapeHtml(asset.filters.join(','))}">
                 <div class="flex w-5/12 min-w-0 items-center gap-2.5">
                     <span class="relative h-7 w-7 shrink-0 overflow-hidden rounded-full bg-slate-100">
                         <span class="hidden h-full w-full items-center justify-center text-[10px] font-bold text-slate-500" data-coinm-fallback>${escapeHtml(asset.symbol.slice(0, 1))}</span>
@@ -738,7 +774,7 @@
     const renderOptionsRows = (contracts) => {
         optionsRowsList.innerHTML = contracts.map((contract) => {
             return `
-                <article class="flex cursor-pointer items-center justify-between border-b border-slate-50 py-3 transition-colors hover:bg-slate-50/80" data-options-row data-options-symbol="${escapeHtml(contract.symbol.toLowerCase())}" data-options-name="${escapeHtml(contract.symbol.toLowerCase())}">
+                <article class="market-row-item flex cursor-pointer items-center justify-between border-b border-slate-50 py-3 transition-colors hover:bg-slate-50/80" data-options-row data-symbol="${escapeHtml(contract.symbol)}" data-price="${escapeHtml(contract.price || '')}" data-change="${escapeHtml(contract.change || '')}" data-options-symbol="${escapeHtml(contract.symbol.toLowerCase())}" data-options-name="${escapeHtml(contract.symbol.toLowerCase())}">
                     <div class="w-5/12 min-w-0">
                         <div class="truncate text-sm font-bold tracking-tight text-slate-900">${escapeHtml(contract.symbol)}</div>
                         <div class="mt-0.5 text-[11px] text-slate-400">${escapeHtml(contract.vol)}</div>

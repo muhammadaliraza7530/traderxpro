@@ -28,6 +28,32 @@ class UserController extends Controller
         return view('user.markets', compact('pageTitle', 'activeTab'));
     }
 
+    public function trade(Request $request)
+    {
+        $symbolInput = $request->query('symbol', 'AAVE');
+        $priceInput = $request->query('price', '167.75');
+        $changeInput = $request->query('change', '-0.37%');
+
+        $symbol = is_string($symbolInput) ? strtoupper($symbolInput) : 'AAVE';
+        $price = is_string($priceInput) ? $priceInput : '167.75';
+        $change = is_string($changeInput) ? $changeInput : '-0.37%';
+
+        if (!preg_match('/^[A-Z0-9._-]{1,30}$/', $symbol)) {
+            $symbol = 'AAVE';
+        }
+        if (!preg_match('/^\$?[0-9][0-9,]*(?:\.[0-9]{1,8})?$/', $price)) {
+            $price = '167.75';
+        }
+        if (!preg_match('/^[+-]?[0-9]+(?:\.[0-9]{1,4})?%$/', $change)) {
+            $change = '-0.37%';
+        }
+
+        $coin = compact('symbol', 'price', 'change');
+        $pageTitle = $symbol . ' Trading Chart';
+
+        return view('user.trade', compact('coin', 'pageTitle'));
+    }
+
     public function home()
     {
         $data['pageTitle']         = 'Dashboard';
@@ -308,7 +334,8 @@ class UserController extends Controller
         }
         $pageTitle = 'Balance Transfer';
         $user      = auth()->user();
-        return view($this->activeTemplate . 'user.balance_transfer', compact('pageTitle', 'user'));
+        $general   = gs();
+        return view($this->activeTemplate . 'user.transfer', compact('pageTitle', 'user', 'general'));
     }
 
     public function transferBalanceSubmit(Request $request)
@@ -382,7 +409,7 @@ class UserController extends Controller
         $transaction->wallet_type  = 'deposit_wallet';
         $transaction->remark       = 'balance_received';
         $transaction->details      = 'Balance received from ' . $user->username;
-        $transaction->post_balance = getAmount($user->deposit_wallet);
+        $transaction->post_balance = getAmount($receiver->deposit_wallet);
         $transaction->save();
 
         notify($user, 'BALANCE_TRANSFER', [
@@ -409,15 +436,34 @@ class UserController extends Controller
 
     public function findUser(Request $request)
     {
-        $user    = User::where('username', $request->username)->first();
-        $message = null;
-        if (!$user) {
-            $message = 'User not found';
+        $uid = trim((string) $request->input('username'));
+        $recipient = User::where('username', $uid)->first();
+
+        if (!$recipient) {
+            return response(['verified' => false, 'message' => 'User not found']);
         }
-        if (@$user->username == auth()->user()->username) {
-            $message = 'You cannot send money to your own account';
+
+        if ($recipient->id === auth()->id()) {
+            return response(['verified' => false, 'message' => 'You cannot transfer to your own account']);
         }
-        return response(['message' => $message]);
+
+        $maskName = static function ($value) {
+            $value = trim((string) $value);
+            return $value === '' ? '' : strtoupper(substr($value, 0, 1)) . '***';
+        };
+        $maskedName = trim($maskName($recipient->firstname) . ' ' . $maskName($recipient->lastname));
+        $maskedUid = strlen($recipient->username) > 4
+            ? str_repeat('*', min(8, strlen($recipient->username) - 4)) . substr($recipient->username, -4)
+            : str_repeat('*', strlen($recipient->username));
+
+        return response([
+            'verified' => true,
+            'message' => null,
+            'recipient' => [
+                'display_name' => $maskedName !== '' ? $maskedName : 'Verified recipient',
+                'masked_uid' => $maskedUid,
+            ],
+        ]);
     }
 
     public function checkUser(Request $request)

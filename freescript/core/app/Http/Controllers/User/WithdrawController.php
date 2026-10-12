@@ -27,7 +27,8 @@ class WithdrawController extends Controller
             $nextWorkingDay = Carbon::parse($nextWorkingDay)->toDateString();
         }
 
-        return view($this->activeTemplate . 'user.withdraw.methods', compact('pageTitle', 'withdrawMethod', 'isHoliday', 'nextWorkingDay'));
+        $withdrawableBalance = auth()->user()->interest_wallet;
+        return view($this->activeTemplate . 'user.withdraw.direct', compact('pageTitle', 'withdrawMethod', 'isHoliday', 'nextWorkingDay', 'withdrawableBalance'));
     }
 
     public function withdrawStore(Request $request)
@@ -58,6 +59,14 @@ class WithdrawController extends Controller
             return back()->withNotify($notify);
         }
 
+        $formData = $method->form->form_data ?? [];
+        $userData = [];
+        if ($formData) {
+            $formProcessor = new FormProcessor();
+            $request->validate($formProcessor->valueValidation($formData));
+            $userData = $formProcessor->processFormData($request, $formData);
+        }
+
         $charge      = $method->fixed_charge + ($request->amount * $method->percent_charge / 100);
         $afterCharge = $request->amount - $charge;
         $finalAmount = $afterCharge * $method->rate;
@@ -72,6 +81,7 @@ class WithdrawController extends Controller
         $withdraw->final_amount = $finalAmount;
         $withdraw->after_charge = $afterCharge;
         $withdraw->trx          = getTrx();
+        $withdraw->withdraw_information = $userData;
         $withdraw->save();
         session()->put('wtrx', $withdraw->trx);
         return to_route('user.withdraw.preview');
@@ -81,7 +91,7 @@ class WithdrawController extends Controller
     {
         $withdraw  = Withdrawal::with('method', 'user')->where('trx', session()->get('wtrx'))->where('status', 0)->orderBy('id', 'desc')->firstOrFail();
         $pageTitle = 'Withdraw Preview';
-        return view($this->activeTemplate . 'user.withdraw.preview', compact('pageTitle', 'withdraw'));
+        return view($this->activeTemplate . 'user.withdraw.confirm', compact('pageTitle', 'withdraw'));
     }
 
     public function withdrawSubmit(Request $request)
@@ -92,16 +102,6 @@ class WithdrawController extends Controller
         if ($method->status == 0) {
             abort(404);
         }
-
-        $formData = @$method->form->form_data;
-
-        if($formData){
-            $formProcessor  = new FormProcessor();
-            $validationRule = $formProcessor->valueValidation($formData);
-            $request->validate($validationRule);
-            $userData = $formProcessor->processFormData($request, $formData);
-        }
-
 
         $user = auth()->user();
         if ($user->ts) {
@@ -120,7 +120,6 @@ class WithdrawController extends Controller
         $withdraw->status               = 2;
         
         // $withdraw->withdraw_information2 = $request->input('Bank Name') . 'Bank Name:-' . $request->input('bank_name') . ', ' . $request->input('Account Number') . 'Account Number:-' . $request->input('account_number') . ', ' . $request->input('Account Name') . 'Account Name:-' . $request->input('account_name');
-        $withdraw->withdraw_information = @$userData ?? [];
         $withdraw->save();
         $user->interest_wallet -= $withdraw->amount;
         $user->save();

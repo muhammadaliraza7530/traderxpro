@@ -23,8 +23,20 @@ class PaymentController extends Controller
         })->with('method')->orderby('name')->get();
         $pageTitle = 'Deposit Methods';
         $user      = auth()->user();
-         $pendingDeposits    = Deposit::pending()->where('user_id', $user->id)->count();
-        return view($this->activeTemplate . 'user.payment.deposit', compact('gatewayCurrency', 'pageTitle','pendingDeposits','user'));
+        $pendingDeposits = Deposit::pending()->where('user_id', $user->id)->count();
+        $depositFlow = request('flow') === 'deposit';
+        $recentDeposits = $depositFlow
+            ? Deposit::where('user_id', $user->id)->with('gateway')->orderByDesc('id')->limit(5)->get()
+            : collect();
+
+        return view($this->activeTemplate . 'user.payment.deposit', compact(
+            'gatewayCurrency',
+            'pageTitle',
+            'pendingDeposits',
+            'user',
+            'depositFlow',
+            'recentDeposits'
+        ));
     }
 
     public function depositInsert(Request $request)

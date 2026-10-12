@@ -34,7 +34,7 @@
                 home: @json(route('user.home')),
                 markets: @json(route('user.markets')),
                 activeMarkets: @json(request()->routeIs('user.markets')),
-                trade: @json(route('plan')),
+                trade: @json(route('user.trade')),
                 staking: @json(route('user.staking.index')),
                 wallet: @json(route('user.deposit.index')),
                 profile: @json(route('user.profile.setting')),

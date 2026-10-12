@@ -15,6 +15,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <meta name="google" content="notranslate">
     <meta name="description" content="">
+
+    <link rel="stylesheet" href="{{ asset($activeTemplateTrue . 'css/lib/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ asset($activeTemplateTrue . 'css/line-awesome.min.css') }}">
+    <link rel="stylesheet" href="{{ asset($activeTemplateTrue . 'css/main.css') }}">
+    @stack('style-lib')
+    <link rel="stylesheet" href="{{ asset($activeTemplateTrue . 'css/custom.css') }}">
+    @stack('style')
+    <link rel="stylesheet" href="{{ asset($activeTemplateTrue . 'css/color.php') }}?color={{ $general->base_color }}">
   
 
 
@@ -1164,7 +1172,7 @@
                 <path id="Vector_4"
                     d="M3.34314 3.45691C4.79086 4.90463 6.79086 5.80007 8.99998 5.80007C11.2091 5.80007 13.2091 4.90463 14.6569 3.45691"
                     stroke="currentColor" stroke-width="1.16667" stroke-linecap="round" stroke-linejoin="round"></path>
-                <path id="Vector_5"
+                <path id="Vector_5" 
                     d="M14.6569 14.5432C13.2091 13.0955 11.2091 12.2001 8.99998 12.2001C6.79086 12.2001 4.79086 13.0955 3.34314 14.5432"
                     stroke="currentColor" stroke-width="1.16667" stroke-linecap="round" stroke-linejoin="round"></path>
             </g>
@@ -1177,8 +1185,10 @@
     </svg>
     <div id="app" data-v-app="" bis_skin_checked="1" class="a-t-44 no-1">
         <div class="van-config-provider" bis_skin_checked="1">
-            <div data-v-f5703ed9="" class="box-border min-h-full w-full layout-tab-bar px-$mg" bis_skin_checked="1">
-                @include($activeTemplate . 'partials.dashboard_header')
+            <div data-v-f5703ed9="" class="box-border min-h-full w-full layout-tab-bar" bis_skin_checked="1">
+                @if (!request()->routeIs('user.trade') && !request()->routeIs('user.staking.index') && !request()->routeIs('user.deposit.index') && !request()->routeIs('user.withdraw*') && !request()->routeIs('user.transfer.balance') && !request()->routeIs('user.markets'))
+                    @include($activeTemplate . 'partials.dashboard_header')
+                @endif
                 <div data-v-f5703ed9="" class="nav-bar-wrap dashboard-white-header hidden" bis_skin_checked="1" style="--40579418: 0;">
                     <div class="nav-bar" bis_skin_checked="1">
                         <!---->

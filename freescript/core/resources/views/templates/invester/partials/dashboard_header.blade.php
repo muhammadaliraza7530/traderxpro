@@ -23,26 +23,5 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
             </svg>
         </a>
-
-        <details class="relative">
-            <summary aria-label="More account options" class="flex h-10 w-8 cursor-pointer list-none items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-900">
-                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                    <circle cx="12" cy="5" r="1.75" />
-                    <circle cx="12" cy="12" r="1.75" />
-                    <circle cx="12" cy="19" r="1.75" />
-                </svg>
-            </summary>
-            <div class="absolute right-0 z-50 mt-2 w-56 overflow-hidden rounded-xl border border-gray-100 bg-white py-1 shadow-lg">
-                <div class="border-b border-gray-100 px-4 py-3">
-                    <p class="truncate text-sm font-semibold text-gray-900">Account &amp; Settings</p>
-                    <p class="mt-1 truncate text-xs text-gray-500">UID: {{ auth()->user()->id }}</p>
-                </div>
-                <a href="{{ route('user.data') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Account details</a>
-                <a href="{{ route('user.kyc.form') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">KYC verification</a>
-                <a href="{{ route('user.twofactor') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Security</a>
-                <a href="{{ route('ticket.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Support</a>
-                <a href="{{ route('user.change.password') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Change password</a>
-            </div>
-        </details>
     </div>
 </header>

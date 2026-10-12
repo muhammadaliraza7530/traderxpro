@@ -1395,6 +1395,8 @@
                                     bis_skin_checked="1"></div>
                             </div>
                            
+                        <button id="toggle-deposit-qr" class="btn cp" type="button" aria-expanded="false" aria-controls="deposit-qr-panel">Show QR code</button>
+                        <div id="deposit-qr-panel" hidden style="display: none;">
                         <div data-v-79706e3f="" class=":uno: mt-25px flex justify-center" bis_skin_checked="1">
                             <div data-v-79706e3f=""
                                 class=":uno: h-164px w-164px flex items-center justify-center border rd-10px shadow-$box-shadow bg-white"
@@ -1403,6 +1405,7 @@
                                     title="TZHbjcTpa4UHLfK6XZearAm2bcWPYDKQQv"><img alt="Scan me!"  width="140"  height="140"  src="{{$data->gateway->qr_code_link}}"   style="display: ;"></div>
                             </div>
                         </div>
+                        </div>
                         <div data-v-79706e3f="" class=":uno: my-$mg text-center text-18px font-bold"
                             bis_skin_checked="1">Recharge Address</div>
                               <input type="text" class="form-control" id="address" value="{{$data->gateway->description}}" readonly hidden>
@@ -1410,12 +1413,10 @@
                             <span data-v-79706e3f="" class=":uno: text-13px">@php echo  $data->gateway->description @endphp</span>
                         </div>
                         <x-viser-form identifier="id" identifierValue="{{ $gateway->form_id }}" />
-                        <div data-v-79706e3f="" class="btn cp" bis_skin_checked="1"><span data-v-79706e3f=""id="copyButton" >Copy</span>
-                        </div><a data-v-79706e3f="" class=":uno: base-main-btn flex items-center justify-center">
-                            <div class="base-main-btn-content"  onclick="login()"  bis_skin_checked="1">
-                                <!----><span data-v-79706e3f="">Recharge Complete</span>
-                            </div>
-                        </a>
+                        <button data-v-79706e3f="" class="btn cp" id="copyButton" type="button">Copy</button>
+                        <button data-v-79706e3f="" class=":uno: base-main-btn flex items-center justify-center" type="submit" style="width: 100%; border: 0; cursor: pointer;">
+                            <span data-v-79706e3f="">Recharge Complete</span>
+                        </button>
                     </div>
                     <div data-v-5a2c3ff1="" data-v-79706e3f="" bis_skin_checked="1" style="direction: ltr;">
                         <div data-v-5a2c3ff1=""
@@ -1851,16 +1852,42 @@
 @endsection
 @push('script')
 <script type="text/javascript">
-    (function ($) {
-        "use strict";
-        $('#copyButton').click(function(){
-            var copyText = document.getElementById("address");
-            copyText.select();
-            copyText.setSelectionRange(0, 99999);
-            /*For mobile devices*/
-            document.execCommand("copy");
-            iziToast.success({message: "Copied: " + copyText.value, position: "topRight"});
-        });
-    })(jQuery);
+    document.getElementById('toggle-deposit-qr')?.addEventListener('click', function () {
+        const qrPanel = document.getElementById('deposit-qr-panel');
+        const showQr = this.getAttribute('aria-expanded') !== 'true';
+        qrPanel.hidden = !showQr;
+        qrPanel.style.display = showQr ? 'block' : 'none';
+        this.setAttribute('aria-expanded', String(showQr));
+        this.textContent = showQr ? 'Hide QR code' : 'Show QR code';
+    });
+
+    document.getElementById('copyButton')?.addEventListener('click', async function () {
+        const address = document.getElementById('address')?.value;
+        if (!address) return;
+
+        let copied = false;
+        if (navigator.clipboard && window.isSecureContext) {
+            try {
+                await navigator.clipboard.writeText(address);
+                copied = true;
+            } catch (error) {
+                copied = false;
+            }
+        }
+
+        if (!copied) {
+            const copyField = document.createElement('textarea');
+            copyField.value = address;
+            copyField.style.position = 'fixed';
+            copyField.style.opacity = '0';
+            document.body.appendChild(copyField);
+            copyField.select();
+            copied = document.execCommand('copy');
+            copyField.remove();
+        }
+
+        this.textContent = copied ? 'Copied' : 'Copy failed';
+        setTimeout(() => { this.textContent = 'Copy'; }, 1600);
+    });
 </script>
 @endpush

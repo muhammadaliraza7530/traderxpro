@@ -1199,7 +1199,7 @@
     </svg>
     <div id="app" data-v-app="" bis_skin_checked="1" class="a-t-44 no-1">
         <div class="van-config-provider" bis_skin_checked="1">
-            <div data-v-f5703ed9="" class="box-border min-h-full w-full layout-tab-bar px-$mg" bis_skin_checked="1">
+            <div data-v-f5703ed9="" class="box-border min-h-full w-full layout-tab-bar" bis_skin_checked="1">
                 <div data-v-f5703ed9="" class="nav-bar-wrap" bis_skin_checked="1" style="--40579418: 0;">
                     <div class="nav-bar" bis_skin_checked="1">
                         <!---->

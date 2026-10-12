@@ -246,10 +246,19 @@ class InvestController extends Controller
         if (!gs('staking_option')) {
             abort(404);
         }
-        $pageTitle  = 'My Staking';
-        $stakings   = Staking::active()->paginate(getPaginate());
-        $myStakings = StakingInvest::where('user_id', auth()->id())->orderBy('id', 'desc')->paginate(getPaginate());
-        return view($this->activeTemplate . 'user.staking', compact('pageTitle', 'stakings', 'myStakings'));
+        $pageTitle = 'Staking Vaults';
+        $stakings = Staking::active()->orderBy('days')->get();
+        $stakingSummary = StakingInvest::where('user_id', auth()->id())
+            ->selectRaw('COALESCE(SUM(CASE WHEN status = 1 THEN invest_amount ELSE 0 END), 0) as total_staked, COALESCE(SUM(interest), 0) as cumulative_earnings')
+            ->first();
+        $activeStakings = StakingInvest::where('user_id', auth()->id())
+            ->where('status', 1)
+            ->where('end_at', '>', now())
+            ->orderBy('end_at')
+            ->limit(5)
+            ->get();
+
+        return view($this->activeTemplate . 'user.staking', compact('pageTitle', 'stakings', 'stakingSummary', 'activeStakings'));
     }
 
     public function saveStaking(Request $request)

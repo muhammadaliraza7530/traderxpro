@@ -14,13 +14,13 @@
                         </div>
                     </div>
                 </div>
-                <div data-v-6cee72ec="" data-v-f5703ed9="" class="index-wrap c-1" bis_skin_checked="1">
+                <div data-v-6cee72ec="" data-v-f5703ed9="" class="index-wrap c-1" style="padding-left: 6px; padding-right: 6px;" bis_skin_checked="1">
                     @php
                         $totalBalance = $user->deposit_wallet + $user->interest_wallet;
                         $earningsShare = $totalBalance > 0 ? ($user->interest_wallet / $totalBalance) * 100 : 0;
                     @endphp
                     <div class="px-4 pt-4 pb-2 space-y-4">
-                        <div class="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm flex items-center justify-between">
+                        <div class="rounded-2xl  bg-white p-4  flex items-center justify-between">
                             <div>
                                 <div class="flex items-center gap-2 text-gray-500 text-sm font-medium">
                                     <span>Total Balance</span>
@@ -45,7 +45,7 @@
                                 </div>
                             </div>
                             <a href="{{ route('user.deposit.index') }}"
-                                class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-3 rounded-2xl shadow-lg shadow-blue-500/25 flex items-center gap-2 text-sm transition-all active:scale-95">
+                                class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-3 py-2 rounded-2xl shadow-lg shadow-blue-500/25 flex items-center gap-2 text-sm transition-all active:scale-95">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                                 </svg>
@@ -389,7 +389,7 @@ function carousel() {
                                 ],
                             ];
                         @endphp
-                        <section id="markets" class="mt-5">
+                        <section id="markets" class="mt-5 px-2">
                             <div class="rounded-3xl bg-white ">
                                 <div class="mb-4 flex items-center justify-between">
                                     <h2 class="text-base font-bold text-slate-900">Market Trends</h2>
@@ -410,7 +410,14 @@ function carousel() {
                                                 $changeValue = (float) str_replace('%', '', $pair['change']);
                                                 $isPositive = $changeValue > 0;
                                             @endphp
-                                            <article class="flex w-full min-w-0 items-center justify-between py-3 transition-colors hover:bg-slate-50/80">
+                                            <article
+                                                class="flex w-full min-w-0 cursor-pointer items-center justify-between py-3 transition-colors hover:bg-slate-50/80"
+                                                data-trade-card
+                                                data-trade-url="{{ route('user.trade') }}"
+                                                data-trade-symbol="{{ $pair['symbol'] }}"
+                                                data-trade-price="{{ $pair['price'] }}"
+                                                data-trade-change="{{ $pair['change'] }}"
+                                            >
                                                 <div class="flex w-5/12 min-w-0 items-center gap-2">
                                                     <img src="{{ $pair['image'] }}" alt="{{ $pair['symbol'] }} logo" class="h-7 w-7 shrink-0 rounded-full object-contain" loading="lazy" />
                                                     <div class="min-w-0">
@@ -1244,6 +1251,29 @@ function carousel() {
             pass.type = 'password'
         }
     }
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('[data-trade-card]').forEach((card) => {
+            card.addEventListener('click', function (event) {
+                if (event.target.closest('button, a, input, select, textarea')) {
+                    return;
+                }
+
+                const symbol = (card.dataset.tradeSymbol || 'BTC').trim();
+                const price = (card.dataset.tradePrice || '0').trim();
+                const change = (card.dataset.tradeChange || '0%').trim();
+                const tradeUrl = new URL(card.dataset.tradeUrl || '{{ route('user.trade') }}', window.location.href);
+
+                tradeUrl.searchParams.set('symbol', symbol);
+                tradeUrl.searchParams.set('price', price);
+                tradeUrl.searchParams.set('change', change);
+
+                window.location.href = tradeUrl.toString();
+            });
+        });
+    });
 </script>
 
 
